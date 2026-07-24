@@ -1,0 +1,2175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="房找人">
+<meta name="theme-color" content="#1a365d">
+<title>房找人 - 你参与创造的理想家</title>
+<meta name="description" content="房找人 — 客户即投资人。表达你的住房需求，参与共创设计，成为项目LP合伙人。CSI驱动品质，数据智能匹配理想家。">
+<meta property="og:title" content="房找人 - 你参与创造的理想家">
+<meta property="og:description" content="客户即投资人。表达住房需求、参与共创设计、成为LP合伙人。CSI驱动品质，AI精准匹配。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="房找人">
+<meta name="twitter:card" content="summary">
+<style>
+:root {
+  --brand-deep: #1a365d;
+  --brand-blue: #2d5a8e;
+  --brand-orange: #ed8936;
+  --brand-green: #38a169;
+  --bg: #f5f6fa;
+  --card-bg: #ffffff;
+  --text-primary: #1a202c;
+  --text-secondary: #718096;
+  --text-light: #a0aec0;
+  --shadow-card: 0 2px 16px rgba(0,0,0,0.06);
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --tab-height: 56px;
+  --hero-gradient: linear-gradient(135deg, #1a365d, #2d5a8e, #1a365d);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  background: #e8ecf1;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+#app {
+  width: 100%;
+  max-width: 430px;
+  background: var(--bg);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: var(--tab-height);
+}
+.page { display: none; }
+.page.active { display: block; }
+.page-content { padding: 16px; padding-bottom: 20px; }
+
+/* 底部导航 */
+#tab-bar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  max-width: 430px;
+  height: var(--tab-height);
+  background: #fff;
+  display: flex;
+  border-top: 1px solid #e2e8f0;
+  z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+}
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 11px;
+  transition: color 0.2s;
+  user-select: none;
+}
+.tab-item.active { color: var(--brand-deep); }
+.tab-item .tab-icon { font-size: 22px; margin-bottom: 2px; line-height: 1; }
+.tab-item .tab-label { font-size: 10px; }
+
+/* 通用组件 */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-card);
+}
+.card-sm {
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-card);
+}
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.section-title .icon { font-size: 18px; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 24px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-primary { background: var(--brand-deep); color: #fff; }
+.btn-orange { background: var(--brand-orange); color: #fff; }
+.btn-green { background: var(--brand-green); color: #fff; }
+.btn-outline { background: transparent; border: 1.5px solid var(--brand-deep); color: var(--brand-deep); }
+.btn-sm { padding: 6px 14px; font-size: 12px; }
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.tag-blue { background: #ebf4ff; color: #2b6cb0; }
+.tag-green { background: #f0fff4; color: #276749; }
+.tag-orange { background: #fffaf0; color: #c05621; }
+.tag-purple { background: #faf5ff; color: #6b46c1; }
+
+/* 阶段进度条 */
+.stage-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+}
+.stage-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.stage-dot.done { background: var(--brand-green); }
+.stage-dot.current { background: var(--brand-orange); box-shadow: 0 0 0 3px rgba(237,137,54,0.25); }
+.stage-dot.pending { background: #e2e8f0; }
+.stage-line { flex: 1; height: 2px; background: #e2e8f0; border-radius: 1px; }
+.stage-line.done { background: var(--brand-green); }
+
+/* 视频轮播 */
+.carousel-container {
+  position: relative;
+  height: 220px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.carousel-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  padding: 24px;
+  text-align: center;
+  color: #fff;
+}
+.carousel-slide.active { opacity: 1; }
+.carousel-icon { font-size: 48px; margin-bottom: 12px; }
+.carousel-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.carousel-subtitle { font-size: 13px; opacity: 0.85; margin-bottom: 10px; }
+.carousel-tags { display: flex; gap: 6px; margin-bottom: 8px; }
+.carousel-tags span {
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(4px);
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+.carousel-price { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+.play-btn {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  border: 2px solid rgba(255,255,255,0.5);
+}
+.carousel-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+}
+.carousel-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  transition: all 0.3s;
+}
+.carousel-dot.active { background: #fff; width: 18px; border-radius: 3px; }
+
+/* 品牌区 */
+.brand-hero {
+  background: var(--hero-gradient);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.brand-hero h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+.brand-hero p { font-size: 13px; opacity: 0.85; line-height: 1.5; }
+
+/* 需求表达入口 */
+.demand-entry {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border: 1.5px dashed var(--brand-orange);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand-orange);
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+/* 统计条 */
+.stats-bar {
+  display: flex;
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-card);
+}
+.stat-item {
+  flex: 1;
+  text-align: center;
+  position: relative;
+}
+.stat-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 24px;
+  background: #e2e8f0;
+}
+.stat-value { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.stat-label { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+
+/* 热门标签 */
+.hot-tags { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.hot-tag {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: var(--text-primary);
+}
+
+/* 横向滚动 */
+.scroll-h {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-h::-webkit-scrollbar { display: none; }
+.scroll-card {
+  flex-shrink: 0;
+  width: 200px;
+  background: #fff;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.scroll-card-img {
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  position: relative;
+}
+.scroll-card-status {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--brand-green);
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.scroll-card-body { padding: 10px; }
+.scroll-card-body h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.scroll-card-body .loc { font-size: 11px; color: var(--text-secondary); }
+.scroll-card-body .price { font-size: 13px; font-weight: 700; color: var(--brand-orange); margin-top: 4px; }
+.scroll-card-tags { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+.scroll-card-tags span {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: #ebf4ff;
+  color: #2b6cb0;
+}
+
+/* LP项目卡片 */
+.lp-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-card);
+}
+.lp-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.lp-card-icon { font-size: 32px; }
+.lp-card-header h4 { font-size: 16px; font-weight: 700; }
+.lp-card-header .loc { font-size: 11px; color: var(--text-secondary); }
+.lp-card-info { display: flex; gap: 16px; margin-bottom: 10px; font-size: 12px; color: var(--text-secondary); }
+.lp-card-info span { font-weight: 600; color: var(--text-primary); }
+.lp-card-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.lp-card-bar .progress { flex: 1; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+.lp-card-bar .progress-fill { height: 100%; background: var(--brand-green); border-radius: 3px; }
+.lp-card-bar .progress-label { font-size: 11px; color: var(--text-secondary); white-space: nowrap; }
+
+/* 评价卡片 */
+.eval-card {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow-card);
+}
+.eval-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.eval-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--brand-blue);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+.eval-stars { color: #f6ad55; font-size: 12px; }
+.eval-text { font-size: 13px; color: var(--text-primary); line-height: 1.5; margin-bottom: 4px; }
+.eval-meta { font-size: 11px; color: var(--text-light); }
+
+/* 子Tab */
+.sub-tabs {
+  display: flex;
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 4px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-card);
+}
+.sub-tab {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+.sub-tab.active { background: var(--brand-deep); color: #fff; }
+
+/* 项目详情 */
+.project-detail-header {
+  background: var(--hero-gradient);
+  padding: 20px;
+  color: #fff;
+  border-radius: 0 0 20px 20px;
+  margin: -16px -16px 16px -16px;
+}
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.8);
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+.stage-progress { margin: 16px 0; }
+.stage-progress .stage-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+.stage-progress .stage-label {
+  font-size: 9px;
+  text-align: center;
+  width: 40px;
+  color: rgba(255,255,255,0.7);
+}
+.stage-progress .stage-label.current { color: #fff; font-weight: 600; }
+
+.csi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--brand-green);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* 投资 */
+.invest-card {
+  background: linear-gradient(135deg, var(--brand-deep), #2d5a8e);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  color: #fff;
+  margin-bottom: 12px;
+}
+.invest-card .amount { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+.invest-card .label { font-size: 12px; opacity: 0.8; }
+.invest-stats { display: flex; gap: 12px; margin-top: 12px; }
+.invest-stat { flex: 1; }
+.invest-stat .val { font-size: 16px; font-weight: 700; }
+.invest-stat .lbl { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+
+.gp-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-card);
+}
+.gp-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.gp-badge {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: var(--brand-green);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 800;
+}
+.gp-ratings { display: flex; flex-direction: column; gap: 8px; }
+.gp-rating { display: flex; align-items: center; justify-content: space-between; }
+.gp-rating .bar { width: 120px; height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; }
+.gp-rating .bar-fill { height: 100%; border-radius: 2px; }
+.gp-rating .score { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+.gp-rating .name { font-size: 12px; color: var(--text-secondary); }
+
+/* 投票 */
+.vote-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-card);
+}
+.vote-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+.vote-option { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+.vote-option .bar-wrap { flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+.vote-option .bar-fill { height: 100%; border-radius: 4px; }
+.vote-option .pct { font-size: 12px; font-weight: 600; min-width: 36px; text-align: right; }
+.vote-option .name { font-size: 12px; min-width: 60px; }
+
+/* 帖子 */
+.post-card {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow-card);
+}
+.post-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.post-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+.post-content { font-size: 14px; color: var(--text-primary); line-height: 1.5; margin-bottom: 8px; }
+.post-actions { display: flex; gap: 16px; font-size: 12px; color: var(--text-secondary); }
+
+/* 我的 */
+.profile-card {
+  background: var(--hero-gradient);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+.profile-avatar {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+.profile-tags { display: flex; gap: 6px; margin-top: 6px; }
+.profile-tags span {
+  background: rgba(255,255,255,0.2);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+}
+
+.menu-list { background: #fff; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-card); }
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f7fafc;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+.menu-item:last-child { border-bottom: none; }
+.menu-item .left { display: flex; align-items: center; gap: 10px; }
+.menu-item .right { color: var(--text-light); font-size: 12px; }
+.badge-dot {
+  width: 8px; height: 8px;
+  background: #e53e3e;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* 弹窗/子页 */
+.sub-page {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 2000;
+  max-width: 430px;
+  margin: 0 auto;
+  overflow-y: auto;
+}
+.sub-page.open { display: block; }
+.sub-page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.sub-page-header .back { font-size: 18px; cursor: pointer; color: var(--text-primary); }
+.sub-page-header h3 { font-size: 16px; font-weight: 700; }
+
+/* 模块配置 */
+.module-config {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-card);
+}
+.module-config h4 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+.module-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.module-opt {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-primary);
+  background: #fff;
+}
+.module-opt.selected { border-color: var(--brand-deep); background: #ebf4ff; color: var(--brand-deep); font-weight: 600; }
+
+.cost-summary {
+  background: linear-gradient(135deg, #f0fff4, #e6fffa);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.cost-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 13px; }
+.cost-row.total { font-size: 16px; font-weight: 700; color: var(--brand-deep); border-top: 1px dashed #cbd5e0; padding-top: 6px; margin-top: 6px; }
+.cost-hint { font-size: 11px; color: var(--brand-green); margin-top: 4px; }
+
+/* FAQ */
+.faq-item { margin-bottom: 10px; }
+.faq-q {
+  background: #fff;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.faq-a {
+  background: #f7fafc;
+  padding: 12px 16px;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  display: none;
+}
+.faq-a.open { display: block; }
+
+.input-area {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.input-area input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 13px;
+  outline: none;
+}
+.input-area input:focus { border-color: var(--brand-blue); }
+
+/* 通知列表 */
+.notif-item {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.notif-item.unread { border-left: 3px solid var(--brand-orange); }
+.notif-icon { font-size: 20px; }
+.notif-content { flex: 1; }
+.notif-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.notif-text { font-size: 12px; color: var(--text-secondary); }
+.notif-time { font-size: 11px; color: var(--text-light); margin-top: 4px; }
+
+/* 表单 */
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid #e2e8f0;
+  font-size: 14px;
+  margin-bottom: 10px;
+  outline: none;
+  font-family: inherit;
+}
+.form-input:focus { border-color: var(--brand-blue); }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="tab-bar"></div>
+  <div id="page-discover" class="page active"></div>
+  <div id="page-projects" class="page"></div>
+  <div id="page-cocreate" class="page"></div>
+  <div id="page-invest" class="page"></div>
+  <div id="page-me" class="page"></div>
+</div>
+
+<div id="sub-project-detail" class="sub-page"></div>
+<div id="sub-notifications" class="sub-page"></div>
+<div id="sub-invest-guide" class="sub-page"></div>
+<div id="sub-faq" class="sub-page"></div>
+<div id="sub-demand" class="sub-page"></div>
+<div id="sub-invite" class="sub-page"></div>
+<div id="sub-settings" class="sub-page"></div>
+<div id="sub-service" class="sub-page"></div>
+<div id="sub-design" class="sub-page"></div>
+<div id="sub-review" class="sub-page"></div>
+
+<script>
+/* ===== 数据 ===== */
+const stages = [
+  { id: 1, name: '需求发现', icon: '🔍', color: '#667eea' },
+  { id: 2, name: '精准获地', icon: '📍', color: '#764ba2' },
+  { id: 3, name: '共创设计', icon: '🎨', color: '#f093fb' },
+  { id: 4, name: '透明建造', icon: '🏗️', color: '#4facfe' },
+  { id: 5, name: '个性化交付', icon: '🔑', color: '#43e97b' },
+  { id: 6, name: '评价验收', icon: '⭐', color: '#fa709a' },
+  { id: 7, name: '持续运营', icon: '🔄', color: '#8ee4af' },
+];
+
+const videoCarousel = [
+  { title: '滨江金帝·奥映世纪', subtitle: '奥体核芯 · 一线江景大宅 · 238-388㎡', icon: '🌊', posterColor: 'linear-gradient(135deg, #1e3a8a, #3730a3, #0f172a)', tags: ['奥体核芯','一线江景','纯大平层'], price: '千万级' },
+  { title: '杭珹未来中心', subtitle: '未来科技城 · TOD综合体 · 智慧社区', icon: '🏙️', posterColor: 'linear-gradient(135deg, #065f46, #0f766e, #164e63)', tags: ['TOD','智慧社区','刚需改善'], price: '350万起' },
+  { title: '滨江建杭·潮映杭园', subtitle: '钱新2.0 · 滨江4.0迭代 · 精装交付', icon: '🏛️', posterColor: 'linear-gradient(135deg, #581c87, #5b21b6, #312e81)', tags: ['钱新2.0','滨江迭代','精装'], price: '600万起' },
+  { title: '滨江&绿城·未科地王', subtitle: '联排+叠排 · 纯低密 · 未科核心', icon: '🏡', posterColor: 'linear-gradient(135deg, #b45309, #ea580c, #991b1b)', tags: ['纯低密','联排叠排','地王'], price: '800万起' },
+];
+
+const realProjects = [
+  { name: '奥映世纪', location: '钱江世纪城', icon: '🌊', price: '千万级', status: '在售', tags: ['一线江景','奥体核芯'], link: 'https://hz.fang.anjuke.com/loupan/531901.html' },
+  { name: '杭珹未来中心', location: '未来科技城', icon: '🏙️', price: '350万起', status: '在售', tags: ['TOD','智慧社区'], link: 'https://hz.fang.anjuke.com/loupan/516134.html' },
+  { name: '潮映杭园', location: '钱江新城二期', icon: '🏛️', price: '600万起', status: '在售', tags: ['钱新2.0','精装'], link: 'https://hz.fang.anjuke.com/loupan/news9-531290.html' },
+  { name: '未科地王', location: '未来科技城', icon: '🏡', price: '800万起', status: '待售', tags: ['纯低密','地王'], link: 'https://hz.fang.anjuke.com/xinfang/hz-lp516134/' },
+  { name: '海威安铂中心', location: '钱江世纪城', icon: '🌆', price: '58000元/㎡', status: '在售', tags: ['高端','大平层'], link: 'https://hz.fang.anjuke.com/loupan/524111.html' },
+  { name: '保利天珺', location: '钱江世纪城', icon: '✨', price: '待定', status: '待售', tags: ['精装','保利'], link: 'https://hz.fang.anjuke.com/loupan/531584.html' },
+];
+
+const customerSegments = [
+  { name: '年轻刚需', pct: 35, color: '#667eea' },
+  { name: '改善家庭', pct: 30, color: '#f093fb' },
+  { name: '品质升级', pct: 20, color: '#4facfe' },
+  { name: '投资养老', pct: 15, color: '#43e97b' },
+];
+
+const lpProjects = [
+  { id:'p1', name:'翡翠湾花园', location:'未来科技城', icon:'🏘️', stage:4, units:286, reserved:213, lpCount:187, minInvest:500000, unitPrice:32000, areaRange:'98-168㎡', csi:4.7, desc:'位于未来科技城核心区，毗邻地铁5号线，LP投资合伙人共同参与，个性化定制交付。', modules:[{name:'户型结构',opts:['三房两厅两卫','四房两厅两卫','三房两厅一卫']},{name:'装修风格',opts:['现代简约','新中式','北欧风','轻奢']},{name:'智能家居',opts:['基础包','舒适包','全屋智能']},{name:'收纳方案',opts:['标准收纳','升级收纳','定制收纳']}] },
+  { id:'p2', name:'云栖山居', location:'之江板块', icon:'🏔️', stage:2, units:156, reserved:89, lpCount:72, minInvest:800000, unitPrice:45000, areaRange:'120-220㎡', csi:4.3, desc:'之江板块低密改善社区，背靠山林，面向钱塘江。', modules:[{name:'户型结构',opts:['四房两厅三卫','五房两厅三卫']},{name:'装修风格',opts:['新中式','现代轻奢','日式禅意']},{name:'庭院方案',opts:['中式庭院','现代花园','禅意枯山水']},{name:'智能家居',opts:['全屋智能豪华包','全屋智能旗舰包']}] },
+  { id:'p3', name:'星耀城', location:'钱江世纪城', icon:'🌆', stage:1, units:420, reserved:56, lpCount:0, minInvest:300000, unitPrice:28000, areaRange:'85-135㎡', csi:null, desc:'钱江世纪城地铁上盖TOD项目，面向年轻家庭和城市新锐。', modules:[] },
+];
+
+const evaluations = [
+  { user:'张先生', project:'翡翠湾花园', stage:'需求发现', score:4.5, text:'需求采集很细致，感觉被充分倾听了', date:'2025-10-15' },
+  { user:'李女士', project:'翡翠湾花园', stage:'共创设计', score:4.8, text:'参与设计的感觉太棒了！方案迭代很快', date:'2026-01-20' },
+  { user:'王先生', project:'翡翠湾花园', stage:'透明建造', score:4.3, text:'直播看工地很放心，但希望能增加更多细节', date:'2026-05-10' },
+];
+
+const myInvestments = [
+  { projectName:'翡翠湾花园', amount:1000000, share:0.00118, currentValue:1080000, estimatedReturn:150000 },
+  { projectName:'云栖山居', amount:500000, share:0.00096, currentValue:510000, estimatedReturn:75000 },
+];
+
+const transactions = [
+  { project:'翡翠湾花园', type:'出资', amount:500000, date:'2025-11-01', status:'已完成' },
+  { project:'翡翠湾花园', type:'二期出资', amount:500000, date:'2026-01-15', status:'已完成' },
+  { project:'云栖山居', type:'出资', amount:500000, date:'2026-05-15', status:'已完成' },
+  { project:'翡翠湾花园', type:'分红', amount:30000, date:'2026-06-30', status:'已到账' },
+];
+
+const notifications = [
+  { title:'建造进度更新', content:'翡翠湾花园主体结构已封顶', time:'2小时前', read:false, icon:'🏗️' },
+  { title:'评价提醒', content:'请对翡翠湾花园「透明建造」阶段进行评价', time:'1天前', read:false, icon:'⭐' },
+  { title:'分红到账', content:'翡翠湾花园项目分红 ¥30,000 已到账', time:'2天前', read:false, icon:'💎' },
+];
+
+const faqs = [
+  {q:'如何表达住房需求？',a:'在首页点击"我想住在这样的房子里..."入口，描述您的理想居住需求。AI将分析并匹配合适的项目。'},
+  {q:'成为LP需要什么条件？',a:'需要完成风险承受能力评估、资金来源合规审查，并满足最低投资额要求。'},
+  {q:'建造过程能看到吗？',a:'可以！在「透明建造」阶段可通过APP实时查看工地直播、关键节点验收记录。'},
+  {q:'CSI评分影响什么？',a:'CSI直接影响GP的管理费收入。CSI≥4.5管理费100%收取，CSI<3.5管理费打折。'},
+];
+
+// ====== 会员系统数据模型 ======
+let currentUser = null; // 当前登录用户
+let isLoggedIn = false;
+const MEMBER_TIERS = { bronze:'青铜会员', silver:'白银会员', gold:'黄金会员', diamond:'钻石会员', lp_partner:'LP合伙人' };
+// 用户行为追踪存储
+let browseLog = JSON.parse(localStorage.getItem('hf_browse_log') || '[]');
+let userProfile = JSON.parse(localStorage.getItem('hf_user_profile') || '{"tags":[],"prefs":{},"score":0}');
+// 模拟用户数据库
+const mockUsers = {
+  '13800001111': { name:'陈建国', id:'FZR20240001', tier:'lp_partner', avatar:'陈', phone:'138****1111', invest:2500000, projects:['翡翠湾花园','云栖山居'], joinDate:'2024-03', points:8620 },
+  '13900002222': { name:'张丽华', id:'FZR20240002', tier:'gold', avatar:'张', phone:'139****2222', invest:0, projects:[], joinDate:'2024-06', points:3250 },
+  '13700003333': { name:'王磊', id:'FZR20240003', tier:'silver', avatar:'王', phone:'137****3333', invest:0, projects:[], joinDate:'2024-09', points:1200 },
+};
+// 偏好标签库
+const prefTags = ['改善型住房','刚需首套','TOD地铁房','低密改善','一线江景','学区刚需','养老康养','投资出租','四房以上','三房两厅','精装交付','毛坯自装','低总价','高端豪宅','近商圈','医疗配套'];
+// 行为事件名称映射
+const eventNames = { view_project:'浏览项目', view_video:'观看视频', click_demand:'表达需求', click_invest:'查看投资', search:'搜索', share:'分享', rate:'评价', stay:'深度浏览', favorite:'收藏' };
+
+const investGuide = [
+  {title:'什么是LP投资合伙人？',content:'LP（有限合伙人）是项目投资的出资方。您作为购房客户可同时成为项目投资合伙人，享受购房折扣+利润分红。'},
+  {title:'投资门槛与收益',content:'最低30万-80万起投。收益包括：购房折扣5%、项目利润分红、房产增值。预期年化8-15%。'},
+  {title:'资金安全',content:'所有LP资金进入托管银行监管账户，三账户隔离。大额支出需托管银行+LP委员会双审核。'},
+  {title:'退出机制',content:'①实物退出-折扣购房 ②现金退出-按份额分红 ③份额转让-平台内部转让。'},
+];
+
+/* ===== 状态管理 ===== */
+let currentTab = 'discover';
+let currentSubTab = 'modules';
+let investSubTab = 'overview';
+let carouselTimer = null;
+let carouselIndex = 0;
+let selectedModules = {};
+let selectedVotes = {};
+let expandedFaqs = {};
+
+/* ===== 工具函数 ===== */
+function h(html) {
+  const t = document.createElement('template');
+  t.innerHTML = html.trim();
+  return t.content.firstChild;
+}
+
+function formatMoney(n) {
+  if (n >= 100000000) return (n / 100000000).toFixed(1) + '亿';
+  if (n >= 10000) return (n / 10000).toFixed(0) + '万';
+  return n.toLocaleString();
+}
+
+function renderStars(score) {
+  let s = '';
+  for (let i = 0; i < 5; i++) {
+    s += i < Math.floor(score) ? '★' : '☆';
+  }
+  return s;
+}
+
+function renderStageBar(current, container, darkMode) {
+  let html = '<div class="stage-bar">';
+  for (let i = 0; i < stages.length; i++) {
+    if (i > 0) {
+      html += '<div class="stage-line' + (i <= current ? ' done' : '') + '"></div>';
+    }
+    let cls = i < current ? 'done' : (i === current ? 'current' : 'pending');
+    html += '<div class="stage-dot ' + cls + '" style="background:' + (cls === 'pending' ? '#e2e8f0' : (cls === 'done' ? '#38a169' : '#ed8936')) + '"></div>';
+  }
+  html += '</div>';
+  html += '<div class="stage-labels">';
+  for (let i = 0; i < stages.length; i++) {
+    html += '<div class="stage-label' + (i === current ? ' current' : '') + '">' + (i+1) + '.' + stages[i].name + '</div>';
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+/* ===== 页面渲染 ===== */
+
+// 首页
+function renderDiscover() {
+  const page = document.getElementById('page-discover');
+  let html = '<div class="page-content">';
+
+  // 视频轮播
+  html += '<div class="carousel-container" id="carousel">';
+  videoCarousel.forEach((v, i) => {
+    html += '<div class="carousel-slide' + (i === 0 ? ' active' : '') + '" style="background:' + v.posterColor + '">';
+    html += '<div class="carousel-icon">' + v.icon + '</div>';
+    html += '<div class="carousel-title">' + v.title + '</div>';
+    html += '<div class="carousel-subtitle">' + v.subtitle + '</div>';
+    html += '<div class="carousel-tags">' + v.tags.map(t => '<span>' + t + '</span>').join('') + '</div>';
+    html += '<div class="carousel-price">' + v.price + '</div>';
+    html += '<div class="play-btn">▶</div>';
+    html += '</div>';
+  });
+  html += '<div class="carousel-dots">';
+  videoCarousel.forEach((_, i) => {
+    html += '<div class="carousel-dot' + (i === 0 ? ' active' : '') + '" data-idx="' + i + '"></div>';
+  });
+  html += '</div></div>';
+
+  // 品牌区
+  html += '<div class="brand-hero"><h1>🏠 房找人</h1><p>你参与创造的理想家 · 客户即投资人</p></div>';
+
+  // 未登录引导条
+  if (!isLoggedIn) {
+    html += '<div class="login-banner" onclick="showLoginModal(\'login\')" style="margin:0 16px 12px;background:linear-gradient(135deg,#1a365d,#2d5a8e);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;color:#fff;">';
+    html += '<div style="font-size:28px;">👤</div>';
+    html += '<div style="flex:1;"><div style="font-weight:700;font-size:14px;">登录/注册 房找人会员</div><div style="font-size:11px;opacity:0.8;">解锁个性化推荐 · 追踪心仪楼盘 · 参与共创</div></div>';
+    html += '<div style="font-size:20px;">›</div></div>';
+  } else {
+    // 登录后个性化欢迎
+    html += '<div style="margin:0 16px 12px;background:#f0fdf4;border:1px solid #c6f6d5;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;">';
+    html += '<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#2d5a8e,#38a169);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;">' + (currentUser?.avatar || '👤') + '</div>';
+    html += '<div style="flex:1;"><div style="font-weight:700;font-size:14px;">欢迎回来，' + (currentUser?.name || '会员') + '</div>';
+    html += '<div style="font-size:11px;color:#718096;">' + MEMBER_TIERS[currentUser?.tier] + ' · ' + (currentUser?.points || 0) + '积分</div></div>';
+    html += '<span style="font-size:11px;background:#38a169;color:#fff;padding:4px 10px;border-radius:10px;">已登录</span></div>';
+  }
+
+  // 需求表达入口
+  html += '<div class="demand-entry" onclick="openSub(\'demand\')">💬 我想住在这样的房子里...</div>';
+
+  // 统计条
+  html += '<div class="stats-bar">';
+  html += '<div class="stat-item"><div class="stat-value">3</div><div class="stat-label">在募项目</div></div>';
+  html += '<div class="stat-item"><div class="stat-value">259</div><div class="stat-label">投资合伙人</div></div>';
+  html += '<div class="stat-item"><div class="stat-value">4.5</div><div class="stat-label">综合CSI</div></div>';
+  html += '<div class="stat-item"><div class="stat-value">25.7亿</div><div class="stat-label">管理资金</div></div>';
+  html += '</div>';
+
+  // 热门需求标签
+  html += '<div class="hot-tags">';
+  html += '<div class="hot-tag">🏙️ TOD地铁房</div>';
+  html += '<div class="hot-tag">🏡 低密改善</div>';
+  html += '<div class="hot-tag">🌊 一线江景</div>';
+  html += '<div class="hot-tag">🎓 学区刚需</div>';
+  html += '</div>';
+
+  // 横向滚动楼盘
+  html += '<div class="section-title"><span class="icon">🏠</span>杭州热门在售楼盘</div>';
+  html += '<div class="scroll-h">';
+  realProjects.forEach(p => {
+    html += '<div class="scroll-card" onclick="window.open(\'' + p.link + '\',\'_blank\')" style="cursor:pointer">';
+    html += '<div class="scroll-card-img" style="background:linear-gradient(135deg,#667eea,#764ba2)">' + p.icon;
+    html += '<span class="scroll-card-status">' + p.status + '</span></div>';
+    html += '<div class="scroll-card-body"><h4>' + p.name + '</h4><div class="loc">📍 ' + p.location + '</div>';
+    html += '<div class="price">' + p.price + '</div>';
+    html += '<div class="scroll-card-tags">' + p.tags.map(t => '<span>' + t + '</span>').join('') + '</div>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+
+  // 正在招募LP的项目
+  html += '<div class="section-title" style="margin-top:16px"><span class="icon">💰</span>正在招募LP的项目</div>';
+  lpProjects.forEach(p => {
+    const reservedPct = Math.round(p.reserved / p.units * 100);
+    html += '<div class="lp-card" onclick="openProjectDetail(\'' + p.id + '\')">';
+    html += '<div class="lp-card-header"><div class="lp-card-icon">' + p.icon + '</div>';
+    html += '<div><h4>' + p.name + '</h4><div class="loc">📍 ' + p.location + '</div></div></div>';
+    html += '<div class="lp-card-info">';
+    html += '<div>总房源 <span>' + p.units + '</span>套</div>';
+    html += '<div>已预定 <span>' + p.reserved + '</span>套</div>';
+    html += '<div>LP合伙人 <span>' + p.lpCount + '</span>人</div>';
+    html += '<div>最低 <span>' + (p.minInvest / 10000) + '万</span>起</div>';
+    html += '</div>';
+    html += '<div class="lp-card-bar">';
+    html += '<div class="progress"><div class="progress-fill" style="width:' + reservedPct + '%"></div></div>';
+    html += '<div class="progress-label">预定率 ' + reservedPct + '%</div>';
+    html += '</div>';
+    html += '<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#718096">';
+    html += '<div style="display:flex;align-items:center;gap:2px">阶段: ' + stages[p.stage-1].icon + ' ' + stages[p.stage-1].name + '</div>';
+    if (p.csi) html += '<span class="csi-badge" style="font-size:11px;padding:2px 10px">CSI ' + p.csi + '</span>';
+    html += '</div></div>';
+  });
+
+  // 客户真实评价
+  html += '<div class="section-title" style="margin-top:16px"><span class="icon">💬</span>客户真实评价</div>';
+  evaluations.forEach(e => {
+    html += '<div class="eval-card"><div class="eval-header">';
+    html += '<div class="eval-avatar">' + e.user[0] + '</div>';
+    html += '<div><div style="font-size:14px;font-weight:600">' + e.user + '</div>';
+    html += '<div style="font-size:11px;color:#a0aec0">' + e.project + ' · ' + e.stage + '</div></div>';
+    html += '<div class="eval-stars" style="margin-left:auto">' + renderStars(e.score) + ' ' + e.score + '</div>';
+    html += '</div>';
+    html += '<div class="eval-text">' + e.text + '</div>';
+    html += '<div class="eval-meta">' + e.date + '</div></div>';
+  });
+
+  html += '</div>';
+  page.innerHTML = html;
+  startCarousel();
+}
+
+// 视频轮播
+function startCarousel() {
+  if (carouselTimer) clearInterval(carouselTimer);
+  carouselIndex = 0;
+  carouselTimer = setInterval(() => {
+    carouselIndex = (carouselIndex + 1) % videoCarousel.length;
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.carousel-dot');
+    slides.forEach((s, i) => s.classList.toggle('active', i === carouselIndex));
+    dots.forEach((d, i) => d.classList.toggle('active', i === carouselIndex));
+  }, 3500);
+}
+
+// 我的项目Tab
+function renderProjects() {
+  const page = document.getElementById('page-projects');
+  let html = '<div class="page-content">';
+  html += '<div class="section-title"><span class="icon">📋</span>我参与的项目</div>';
+
+  const myProjects = lpProjects.filter(p => p.id === 'p1' || p.id === 'p2');
+  myProjects.forEach(p => {
+    const reservedPct = Math.round(p.reserved / p.units * 100);
+    html += '<div class="lp-card" onclick="openProjectDetail(\'' + p.id + '\')">';
+    html += '<div class="lp-card-header"><div class="lp-card-icon">' + p.icon + '</div>';
+    html += '<div><h4>' + p.name + '</h4><div class="loc">📍 ' + p.location + '</div></div></div>';
+    html += '<div class="lp-card-info">';
+    html += '<div>总房源 <span>' + p.units + '</span>套</div>';
+    html += '<div>已预定 <span>' + p.reserved + '</span>套</div>';
+    html += '<div>LP合伙人 <span>' + p.lpCount + '</span>人</div>';
+    html += '</div>';
+    html += '<div class="lp-card-bar">';
+    html += '<div class="progress"><div class="progress-fill" style="width:' + reservedPct + '%"></div></div>';
+    html += '<div class="progress-label">预定率 ' + reservedPct + '%</div>';
+    html += '</div>';
+    html += '<div style="font-size:12px;color:#718096">阶段: ' + stages[p.stage-1].icon + ' ' + stages[p.stage-1].name;
+    if (p.csi) html += ' <span class="csi-badge" style="font-size:11px;padding:2px 10px">CSI ' + p.csi + '</span>';
+    html += '</div></div>';
+  });
+
+  html += '<div class="section-title" style="margin-top:16px"><span class="icon">🔍</span>发现更多项目</div>';
+  const other = lpProjects.filter(p => p.id === 'p3');
+  other.forEach(p => {
+    html += '<div class="lp-card" onclick="openProjectDetail(\'' + p.id + '\')" style="border:1.5px dashed #e2e8f0">';
+    html += '<div class="lp-card-header"><div class="lp-card-icon">' + p.icon + '</div>';
+    html += '<div><h4>' + p.name + '</h4><div class="loc">📍 ' + p.location + '</div></div>';
+    html += '<span class="tag tag-orange">新项目</span></div>';
+    html += '<div class="lp-card-info">';
+    html += '<div>总房源 <span>' + p.units + '</span>套</div>';
+    html += '<div>已预定 <span>' + p.reserved + '</span>套</div>';
+    html += '<div>最低 <span>' + (p.minInvest / 10000) + '万</span>起</div>';
+    html += '</div>';
+    html += '<div style="font-size:12px;color:#718096">' + p.desc + '</div></div>';
+  });
+
+  html += '</div>';
+  page.innerHTML = html;
+}
+
+// 项目详情子页
+function openProjectDetail(id) {
+  let p = null;
+  let isRealProject = false;
+
+  // 判断是真实在售项目还是LP项目
+  if (id.startsWith('real-')) {
+    const realName = id.replace('real-', '');
+    const rp = realProjects.find(x => x.name === realName);
+    if (!rp) return;
+    isRealProject = true;
+    // 为在售项目构造兼容数据
+    p = {
+      id: 'real-' + rp.name,
+      name: rp.name,
+      location: rp.location,
+      icon: rp.icon,
+      desc: rp.name + ' · ' + rp.location + ' · ' + rp.tags.join('、') + ' · 参考价 ' + rp.price,
+      stage: 5, // 在售
+      units: '-',
+      reserved: '-',
+      lpCount: '-',
+      minInvest: 0,
+      unitPrice: 0,
+      areaRange: '-',
+      csi: null,
+      status: rp.status,
+      price: rp.price,
+      tags: rp.tags,
+      modules: [],
+    };
+  } else {
+    p = lpProjects.find(x => x.id === id);
+    if (!p) return;
+  }
+
+  const sub = document.getElementById('sub-project-detail');
+  let html = '<div class="sub-page-header"><span class="back" onclick="closeSub(\'project-detail\')">← 返回</span><h3>' + p.name + '</h3></div>';
+  html += '<div style="padding:16px">';
+
+  // Header
+  html += '<div class="project-detail-header" style="margin:0 0 16px 0;border-radius:16px">';
+  html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">';
+  html += '<div style="font-size:40px">' + p.icon + '</div>';
+  html += '<div><h2 style="font-size:20px">' + p.name + '</h2><div style="font-size:12px;opacity:0.8">📍 ' + p.location + '</div></div>';
+  if (p.csi) html += '<div class="csi-badge" style="margin-left:auto">CSI ' + p.csi + '</div>';
+  html += '</div>';
+  html += '<div style="font-size:13px;opacity:0.9;margin-bottom:12px">' + p.desc + '</div>';
+  if (!isRealProject) html += '<div class="stage-progress" id="detail-stage-bar"></div>';
+  html += '</div>';
+
+  if (isRealProject) {
+    // ===== 在售项目详情 =====
+    html += '<div class="card"><div class="section-title"><span class="icon">📊</span>项目信息</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:12px">';
+    html += '<div style="flex:1;min-width:80px"><div style="font-size:20px;font-weight:700;color:#1a365d">' + p.status + '</div><div style="font-size:11px;color:#718096">销售状态</div></div>';
+    html += '<div style="flex:1;min-width:80px"><div style="font-size:20px;font-weight:700;color:#1a365d">' + p.price + '</div><div style="font-size:11px;color:#718096">参考均价</div></div>';
+    html += '</div>';
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">';
+    p.tags.forEach(t => { html += '<span class="tag tag-blue">' + t + '</span>'; });
+    html += '</div></div>';
+
+    // 销售动态
+    html += '<div class="card"><div class="section-title"><span class="icon">📈</span>销售动态</div>';
+    html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center;">';
+    html += '<div style="background:#f7fafc;border-radius:10px;padding:12px;"><div style="font-size:22px;font-weight:700;color:#1a365d;">' + (p.name.length * 17 + 100) + '</div><div style="font-size:11px;color:#718096;">在售套数</div></div>';
+    html += '<div style="background:#f7fafc;border-radius:10px;padding:12px;"><div style="font-size:22px;font-weight:700;color:#38a169;">' + (p.name.length * 23) + '</div><div style="font-size:11px;color:#718096;">本月成交</div></div>';
+    html += '<div style="background:#f7fafc;border-radius:10px;padding:12px;"><div style="font-size:22px;font-weight:700;color:#ed8936;">' + (p.name.length * 3 + 30) + '%</div><div style="font-size:11px;color:#718096;">去化率</div></div>';
+    html += '</div></div>';
+
+    // 周边在售
+    html += '<div class="card"><div class="section-title"><span class="icon">🏠</span>更多在售项目</div>';
+    html += '<div class="scroll-h">';
+    realProjects.filter(r => r.name !== p.name).slice(0, 4).forEach(r => {
+      html += '<div class="scroll-card" onclick="window.open(\'' + r.link + '\',\'_blank\')" style="cursor:pointer">';
+      html += '<div class="scroll-card-img" style="background:linear-gradient(135deg,#667eea,#764ba2)">' + r.icon + '<span class="scroll-card-status">' + r.status + '</span></div>';
+      html += '<div class="scroll-card-body"><h4>' + r.name + '</h4><div class="loc">📍 ' + r.location + '</div><div class="price">' + r.price + '</div></div></div>';
+    });
+    html += '</div></div>';
+
+    // 咨询入口
+    html += '<div class="card" style="background:linear-gradient(135deg,#fffbeb,#fef3c7);text-align:center">';
+    html += '<div style="font-size:16px;font-weight:700;margin-bottom:6px">📞 了解' + p.name + '详情</div>';
+    html += '<div style="font-size:13px;color:#718096;margin-bottom:10px">获取户型图、价格表、最新优惠</div>';
+    const rpLink = realProjects.find(r => r.name === p.name);
+    html += '<button class="btn btn-orange" onclick="window.open(\'' + (rpLink ? rpLink.link : '#') + '\',\'_blank\')">查看真实房源 →</button></div>';
+
+  } else {
+    // ===== LP项目详情（原有逻辑）=====
+    // 项目概况
+    html += '<div class="card"><div class="section-title"><span class="icon">📊</span>项目概况</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:12px">';
+    html += '<div style="flex:1;min-width:80px"><div style="font-size:20px;font-weight:700;color:#1a365d">' + p.units + '</div><div style="font-size:11px;color:#718096">总房源(套)</div></div>';
+    html += '<div style="flex:1;min-width:80px"><div style="font-size:20px;font-weight:700;color:#1a365d">' + p.reserved + '</div><div style="font-size:11px;color:#718096">已预定(套)</div></div>';
+    html += '<div style="flex:1;min-width:80px"><div style="font-size:20px;font-weight:700;color:#1a365d">' + (p.unitPrice/10000).toFixed(1) + '万</div><div style="font-size:11px;color:#718096">均价/㎡</div></div>';
+    html += '<div style="flex:1;min-width:80px"><div style="font-size:20px;font-weight:700;color:#1a365d">' + p.areaRange + '</div><div style="font-size:11px;color:#718096">面积段</div></div>';
+    html += '</div></div>';
+
+    // 视频区
+    html += '<div class="card" style="text-align:center">';
+    html += '<div style="font-size:40px;margin-bottom:8px">📹</div>';
+    html += '<div style="font-size:14px;font-weight:600;margin-bottom:4px">工地实况直播</div>';
+    html += '<div style="font-size:12px;color:#718096;margin-bottom:10px">实时查看建造进度</div>';
+    html += '<button class="btn btn-outline btn-sm" onclick="showAppToast(\'正在连接工地直播...\')">▶ 观看直播</button></div>';
+
+    // CSI评分
+    if (p.csi) {
+      html += '<div class="card"><div class="section-title"><span class="icon">⭐</span>CSI 综合满意度评分</div>';
+      html += '<div style="display:flex;align-items:center;gap:12px">';
+      html += '<div style="font-size:40px;font-weight:800;color:#38a169">' + p.csi + '</div>';
+      html += '<div><div style="font-size:14px;font-weight:600">' + renderStars(p.csi) + '</div>';
+      html += '<div style="font-size:12px;color:#718096">客户综合满意度评分<br/>≥4.5 GP管理费100%</div></div>';
+      html += '</div></div>';
+    }
+
+    // 周边热门在售
+    html += '<div class="card"><div class="section-title"><span class="icon">🏠</span>周边热门在售</div>';
+    html += '<div class="scroll-h">';
+    realProjects.slice(0, 4).forEach(r => {
+      html += '<div class="scroll-card" onclick="window.open(\'' + r.link + '\',\'_blank\')" style="cursor:pointer">';
+      html += '<div class="scroll-card-img" style="background:linear-gradient(135deg,#667eea,#764ba2)">' + r.icon + '<span class="scroll-card-status">' + r.status + '</span></div>';
+      html += '<div class="scroll-card-body"><h4>' + r.name + '</h4><div class="loc">📍 ' + r.location + '</div><div class="price">' + r.price + '</div></div></div>';
+    });
+    html += '</div></div>';
+
+    // 投资CTA
+    html += '<div class="card" style="background:linear-gradient(135deg,#fffbeb,#fef3c7);margin-top:12px;text-align:center">';
+    html += '<div style="font-size:16px;font-weight:700;margin-bottom:6px">💰 成为项目投资合伙人</div>';
+    html += '<div style="font-size:13px;color:#718096;margin-bottom:10px">最低 ' + (p.minInvest/10000) + '万起投 · 享购房折扣+利润分红</div>';
+    html += '<button class="btn btn-orange" onclick="showAppToast(\'投资顾问将在24小时内联系您\')">立即了解 →</button></div>';
+  }
+
+  html += '</div>';
+  sub.innerHTML = html;
+  sub.classList.add('open');
+
+  // 渲染阶段进度条（仅LP项目）
+  if (!isRealProject) {
+    setTimeout(() => {
+      const bar = document.getElementById('detail-stage-bar');
+      if (bar) renderStageBar(p.stage - 1, bar, true);
+    }, 50);
+  }
+}
+
+// 共创Tab
+function renderCocreate() {
+  const page = document.getElementById('page-cocreate');
+  let html = '<div class="page-content">';
+  html += '<div class="sub-tabs">';
+  html += '<div class="sub-tab' + (currentSubTab === 'modules' ? ' active' : '') + '" onclick="switchCocreateTab(\'modules\')">模块配置</div>';
+  html += '<div class="sub-tab' + (currentSubTab === 'votes' ? ' active' : '') + '" onclick="switchCocreateTab(\'votes\')">方案投票</div>';
+  html += '<div class="sub-tab' + (currentSubTab === 'community' ? ' active' : '') + '" onclick="switchCocreateTab(\'community\')">社群讨论</div>';
+  html += '</div>';
+
+  if (currentSubTab === 'modules') {
+    html += renderCocreateModules();
+  } else if (currentSubTab === 'votes') {
+    html += renderCocreateVotes();
+  } else {
+    html += renderCocreateCommunity();
+  }
+
+  html += '</div>';
+  page.innerHTML = html;
+}
+
+function renderCocreateModules() {
+  const p = lpProjects[0]; // 翡翠湾花园
+  if (Object.keys(selectedModules).length === 0) {
+    selectedModules = {};
+    p.modules.forEach(m => { selectedModules[m.name] = m.opts[0]; });
+  }
+  let html = '';
+
+  // 3D预览区
+  html += '<div class="card" style="text-align:center;padding:24px">';
+  html += '<div style="font-size:48px;margin-bottom:8px">🏘️</div>';
+  html += '<div style="font-size:14px;font-weight:600">3D户型预览</div>';
+  html += '<div style="font-size:12px;color:#718096;margin-top:4px">实时预览您的定制方案</div>';
+  html += '<div style="display:flex;gap:8px;justify-content:center;margin-top:10px">';
+  html += '<button class="btn btn-outline btn-sm" onclick="showAppToast(\'3D模型已旋转\')">🔄 旋转</button>';
+  html += '<button class="btn btn-outline btn-sm" onclick="showAppToast(\'3D模型已放大\')">🔍 放大</button>';
+  html += '</div></div>';
+
+  // 模块选择器
+  p.modules.forEach(m => {
+    html += '<div class="module-config"><h4>📐 ' + m.name + '</h4>';
+    html += '<div class="module-options">';
+    m.opts.forEach(opt => {
+      const sel = selectedModules[m.name] === opt;
+      html += '<div class="module-opt' + (sel ? ' selected' : '') + '" onclick="selectModule(\'' + m.name + '\',\'' + opt + '\')">' + opt + '</div>';
+    });
+    html += '</div></div>';
+  });
+
+  // 费用概览
+  const basePrice = p.unitPrice * 120;
+  const upgrades = Object.keys(selectedModules).length > 1 ? 180000 : 0;
+  const total = basePrice + upgrades;
+  const lpDiscount = Math.round(total * 0.05);
+  html += '<div class="cost-summary">';
+  html += '<div class="cost-row"><span>基准价（120㎡×' + (p.unitPrice/10000).toFixed(1) + '万/㎡）</span><span>' + formatMoney(basePrice) + '</span></div>';
+  html += '<div class="cost-row"><span>增项</span><span style="color:#e53e3e">+' + formatMoney(upgrades) + '</span></div>';
+  html += '<div class="cost-row total"><span>总价</span><span>' + formatMoney(total) + '</span></div>';
+  html += '<div class="cost-hint">💎 LP投资合伙人享' + formatMoney(lpDiscount) + '购房折扣（5%）</div>';
+  html += '</div>';
+
+  return html;
+}
+
+function selectModule(name, opt) {
+  selectedModules[name] = opt;
+  renderCocreate();
+}
+
+function renderCocreateVotes() {
+  const votes = [
+    { title: '外立面方案', options: [{name:'现代玻璃幕墙', pct:62, color:'#667eea'},{name:'新中式石材', pct:38, color:'#f093fb'}] },
+    { title: '景观方案', options: [{name:'中央水景花园', pct:45, color:'#4facfe'},{name:'全龄活动公园', pct:55, color:'#43e97b'}] },
+    { title: '公区方案', options: [{name:'酒店式大堂', pct:51, color:'#fa709a'},{name:'邻里共享空间', pct:49, color:'#8ee4af'}] },
+  ];
+  let html = '';
+  votes.forEach((v, vi) => {
+    html += '<div class="vote-card"><div class="vote-title">🗳️ ' + v.title + '</div>';
+    v.options.forEach(o => {
+      const voted = selectedVotes[vi] === o.name;
+      html += '<div class="vote-option">';
+      html += '<div class="name">' + o.name + '</div>';
+      html += '<div class="bar-wrap"><div class="bar-fill" style="width:' + o.pct + '%;background:' + o.color + '"></div></div>';
+      html += '<div class="pct">' + o.pct + '%</div>';
+      html += '<button class="btn btn-sm ' + (voted ? 'btn-primary' : 'btn-outline') + '" onclick="voteOption(' + vi + ',\'' + o.name + '\')">' + (voted ? '已投' : '投票') + '</button>';
+      html += '</div>';
+    });
+    html += '<div style="font-size:11px;color:#a0aec0;margin-top:8px">共128人参与投票 · 剩余2天</div></div>';
+  });
+  return html;
+}
+
+function voteOption(idx, name) {
+  selectedVotes[idx] = name;
+  renderCocreate();
+}
+
+function renderCocreateCommunity() {
+  const posts = [
+    { user:'刘先生', avatar:'#667eea', content:'翡翠湾花园的外立面方案大家怎么看？玻璃幕墙虽然好看但维护成本是不是很高？', likes:23, replies:8 },
+    { user:'陈女士', avatar:'#f093fb', content:'分享一下我去工地实拍的图片，进度比预期快了不少！', likes:45, replies:15 },
+    { user:'赵先生', avatar:'#4facfe', content:'关于智能家居方案，强烈建议加入全屋净水系统，这个非常实用', likes:18, replies:6 },
+  ];
+  let html = '';
+  html += '<div class="input-area">';
+  html += '<input type="text" id="communityInput" placeholder="分享你的想法...">';
+  html += '<button class="btn btn-primary btn-sm" onclick="postCommunityMsg()">发布</button>';
+  html += '</div>';
+
+  posts.forEach(p => {
+    html += '<div class="post-card"><div class="post-header">';
+    html += '<div class="post-avatar" style="background:' + p.avatar + ';color:#fff">' + p.user[0] + '</div>';
+    html += '<div style="font-weight:600;font-size:13px">' + p.user + '</div></div>';
+    html += '<div class="post-content">' + p.content + '</div>';
+    html += '<div class="post-actions"><span>👍 ' + p.likes + '</span><span>💬 ' + p.replies + ' 回复</span><span>📤 分享</span></div></div>';
+  });
+
+  return html;
+}
+
+function switchCocreateTab(tab) {
+  currentSubTab = tab;
+  renderCocreate();
+}
+
+// 投资Tab
+function renderInvest() {
+  const page = document.getElementById('page-invest');
+  let html = '<div class="page-content">';
+  html += '<div class="sub-tabs">';
+  html += '<div class="sub-tab' + (investSubTab === 'overview' ? ' active' : '') + '" onclick="switchInvestTab(\'overview\')">总览</div>';
+  html += '<div class="sub-tab' + (investSubTab === 'projects' ? ' active' : '') + '" onclick="switchInvestTab(\'projects\')">项目</div>';
+  html += '<div class="sub-tab' + (investSubTab === 'transactions' ? ' active' : '') + '" onclick="switchInvestTab(\'transactions\')">流水</div>';
+  html += '</div>';
+
+  if (investSubTab === 'overview') {
+    // LP身份卡片
+    const totalInvest = myInvestments.reduce((s, i) => s + i.amount, 0);
+    const totalValue = myInvestments.reduce((s, i) => s + i.currentValue, 0);
+    const totalReturn = myInvestments.reduce((s, i) => s + i.estimatedReturn, 0);
+    const returnRate = (totalReturn / totalInvest * 100).toFixed(1);
+
+    html += '<div class="invest-card">';
+    html += '<div style="font-size:13px;opacity:0.8;margin-bottom:6px">💎 LP投资合伙人</div>';
+    html += '<div class="amount">¥' + formatMoney(totalInvest) + '</div>';
+    html += '<div class="label">累计投资</div>';
+    html += '<div class="invest-stats">';
+    html += '<div class="invest-stat"><div class="val">¥' + formatMoney(totalValue) + '</div><div class="lbl">当前估值</div></div>';
+    html += '<div class="invest-stat"><div class="val">¥' + formatMoney(totalReturn) + '</div><div class="lbl">预期收益</div></div>';
+    html += '<div class="invest-stat"><div class="val" style="color:#43e97b">+' + returnRate + '%</div><div class="lbl">回报率</div></div>';
+    html += '</div></div>';
+
+    // GP评级
+    html += '<div class="gp-card"><div class="section-title"><span class="icon">🏅</span>GP 评级</div>';
+    html += '<div class="gp-header"><div class="gp-badge">A+</div>';
+    html += '<div><div style="font-size:15px;font-weight:700">房找人资产管理</div><div style="font-size:11px;color:#718096">GP管理人 · 成立5年</div></div></div>';
+    html += '<div class="gp-ratings">';
+    html += '<div class="gp-rating"><span class="name">专业能力</span><div class="bar"><div class="bar-fill" style="width:96%;background:#667eea"></div></div><span class="score">4.8</span></div>';
+    html += '<div class="gp-rating"><span class="name">透明度</span><div class="bar"><div class="bar-fill" style="width:92%;background:#4facfe"></div></div><span class="score">4.6</span></div>';
+    html += '<div class="gp-rating"><span class="name">回报率</span><div class="bar"><div class="bar-fill" style="width:90%;background:#43e97b"></div></div><span class="score">4.5</span></div>';
+    html += '</div></div>';
+
+    // 投资组合
+    html += '<div class="section-title"><span class="icon">📁</span>投资组合</div>';
+    myInvestments.forEach(inv => {
+      const ret = (inv.estimatedReturn / inv.amount * 100).toFixed(1);
+      html += '<div class="card-sm"><div style="display:flex;justify-content:space-between;align-items:center">';
+      html += '<div><div style="font-weight:700;font-size:15px">' + inv.projectName + '</div>';
+      html += '<div style="font-size:11px;color:#718096">份额 ' + (inv.share * 100).toFixed(3) + '%</div></div>';
+      html += '<div style="text-align:right"><div style="font-weight:700;color:#38a169">+' + ret + '%</div>';
+      html += '<div style="font-size:11px;color:#718096">¥' + formatMoney(inv.currentValue) + '</div></div>';
+      html += '</div></div>';
+    });
+
+    // 新项目招募
+    html += '<div class="card" style="background:linear-gradient(135deg,#f0fff4,#e6fffa);text-align:center;margin-top:12px">';
+    html += '<div style="font-size:16px;font-weight:700;margin-bottom:4px">🔔 新项目招募中</div>';
+    html += '<div style="font-size:13px;color:#718096;margin-bottom:10px">星耀城 · 钱江世纪城 · 30万起投</div>';
+    html += '<button class="btn btn-green" onclick="showAppToast(\'已跳转到项目详情\')">查看详情 →</button></div>';
+
+  } else if (investSubTab === 'projects') {
+    myInvestments.forEach(inv => {
+      const p = lpProjects.find(x => x.name === inv.projectName);
+      html += '<div class="card"><div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">';
+      html += '<div style="font-size:32px">' + (p ? p.icon : '🏘️') + '</div>';
+      html += '<div><div style="font-weight:700;font-size:16px">' + inv.projectName + '</div>';
+      html += '<div style="font-size:12px;color:#718096">投资 ¥' + formatMoney(inv.amount) + ' · 份额 ' + (inv.share * 100).toFixed(3) + '%</div></div></div>';
+      html += '<div style="display:flex;gap:16px">';
+      html += '<div><div style="font-size:14px;font-weight:700;color:#38a169">¥' + formatMoney(inv.currentValue) + '</div><div style="font-size:11px;color:#718096">当前估值</div></div>';
+      html += '<div><div style="font-size:14px;font-weight:700;color:#ed8936">+¥' + formatMoney(inv.estimatedReturn) + '</div><div style="font-size:11px;color:#718096">预期收益</div></div>';
+      html += '</div></div>';
+    });
+
+  } else {
+    html += '<div style="margin-bottom:12px;font-size:13px;color:#718096">资金流水记录</div>';
+    transactions.forEach(t => {
+      const isIn = t.type.includes('分红');
+      html += '<div class="card-sm"><div style="display:flex;justify-content:space-between;align-items:center">';
+      html += '<div><div style="font-weight:600;font-size:14px">' + t.project + '</div>';
+      html += '<div style="font-size:12px;color:#718096">' + t.type + ' · ' + t.date + '</div></div>';
+      html += '<div style="text-align:right"><div style="font-weight:700;color:' + (isIn ? '#38a169' : '#e53e3e') + '">' + (isIn ? '+' : '-') + '¥' + formatMoney(t.amount) + '</div>';
+      html += '<span class="tag tag-green" style="font-size:10px">' + t.status + '</span></div>';
+      html += '</div></div>';
+    });
+  }
+
+  html += '</div>';
+  page.innerHTML = html;
+}
+
+function switchInvestTab(tab) {
+  investSubTab = tab;
+  renderInvest();
+}
+
+// 我的Tab
+function renderMe() {
+  const page = document.getElementById('page-me');
+  let html = '<div class="page-content">';
+
+  if (!isLoggedIn) {
+    // ===== 未登录状态 =====
+    html += '<div style="text-align:center;padding:40px 20px;">';
+    html += '<div style="font-size:64px;margin-bottom:16px;">👤</div>';
+    html += '<h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">登录房找人</h3>';
+    html += '<p style="font-size:13px;color:#718096;margin-bottom:24px;">登录后享受个性化推荐、追踪心仪楼盘、参与共创设计</p>';
+    html += '<button onclick="showLoginModal(\'login\')" style="padding:12px 48px;background:linear-gradient(135deg,#1a365d,#2d5a8e);color:#fff;border:none;border-radius:24px;font-size:15px;font-weight:700;cursor:pointer;">登录 / 注册</button>';
+    html += '<div style="margin-top:16px;font-size:12px;color:#a0aec0;">首次注册即送100积分</div>';
+    html += '</div>';
+
+    // 游客可浏览内容
+    html += '<div class="card"><div class="section-title"><span class="icon">📖</span>投资指南</div>';
+    investGuide.slice(0,2).forEach(g => {
+      html += '<div style="padding:8px 0;border-bottom:1px solid #f7fafc;"><div style="font-weight:600;font-size:14px;">' + g.title + '</div><div style="font-size:12px;color:#718096;">' + g.content.slice(0,60) + '...</div></div>';
+    });
+    html += '<div style="text-align:center;margin-top:8px;font-size:13px;color:#2d5a8e;font-weight:600;cursor:pointer;" onclick="openSub(\'invest-guide\')">查看全部 ›</div></div>';
+
+    html += '<div class="card"><div class="section-title"><span class="icon">❓</span>常见问题</div>';
+    faqs.slice(0,3).forEach(f => {
+      html += '<div style="padding:8px 0;border-bottom:1px solid #f7fafc;"><div style="font-size:13px;font-weight:500;">' + f.q + '</div><div style="font-size:12px;color:#718096;">' + f.a.slice(0,50) + '...</div></div>';
+    });
+    html += '<div style="text-align:center;margin-top:8px;font-size:13px;color:#2d5a8e;font-weight:600;cursor:pointer;" onclick="openSub(\'faq\')">查看全部 ›</div></div>';
+
+  } else {
+    // ===== 已登录会员中心 =====
+    const u = currentUser;
+    const tierName = MEMBER_TIERS[u.tier] || '普通会员';
+    const tierColors = { bronze:'#cd7f32', silver:'#a0aec0', gold:'#f6ad55', diamond:'#667eea', lp_partner:'#ed8936' };
+    const tierColor = tierColors[u.tier] || '#718096';
+
+    // 会员信息卡片
+    html += '<div class="profile-card" style="background:linear-gradient(135deg,#1a365d,#2d5a8e);color:#fff;border-radius:16px;padding:20px;margin-bottom:16px;">';
+    html += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">';
+    html += '<div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;">' + u.avatar + '</div>';
+    html += '<div style="flex:1;"><div style="font-size:20px;font-weight:700;">' + u.name + '</div>';
+    html += '<div style="font-size:12px;opacity:0.8;">ID: ' + u.id + ' · ' + u.phone + '</div>';
+    html += '<div style="display:flex;gap:6px;margin-top:4px;">';
+    html += '<span style="background:' + tierColor + ';color:#fff;padding:2px 10px;border-radius:10px;font-size:11px;">' + tierName + '</span>';
+    if (u.tier === 'lp_partner') html += '<span style="background:rgba(255,255,255,0.2);padding:2px 10px;border-radius:10px;font-size:11px;">LP合伙人</span>';
+    html += '</div></div>';
+    html += '<button onclick="doLogout()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:6px 12px;border-radius:8px;font-size:11px;cursor:pointer;">退出</button>';
+    html += '</div>';
+
+    // 数据统计行
+    html += '<div style="display:flex;gap:0;">';
+    html += '<div style="flex:1;text-align:center;"><div style="font-size:22px;font-weight:700;">' + u.points + '</div><div style="font-size:11px;opacity:0.7;">积分</div></div>';
+    html += '<div style="flex:1;text-align:center;"><div style="font-size:22px;font-weight:700;">' + (u.invest > 0 ? '¥' + (u.invest/10000).toFixed(0) + '万' : '0') + '</div><div style="font-size:11px;opacity:0.7;">投资额</div></div>';
+    html += '<div style="flex:1;text-align:center;"><div style="font-size:22px;font-weight:700;">' + u.projects.length + '</div><div style="font-size:11px;opacity:0.7;">参与项目</div></div>';
+    html += '<div style="flex:1;text-align:center;"><div style="font-size:22px;font-weight:700;">' + browseLog.filter(b => b.sessionId === localStorage.getItem('hf_session_id')).length + '</div><div style="font-size:11px;opacity:0.7;">本次浏览</div></div>';
+    html += '</div>';
+    html += '</div>';
+
+    // 需求画像（动态）
+    html += '<div class="card"><div class="section-title"><span class="icon">🎯</span>我的需求画像 <span style="font-size:10px;color:#a0aec0;font-weight:400;">AI动态更新</span></div>';
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">';
+    const profileTags = userProfile.tags && userProfile.tags.length > 0 ? userProfile.tags : ['改善型住房','四房以上','地铁沿线'];
+    profileTags.forEach(t => {
+      html += '<span class="tag tag-blue">' + t + '</span>';
+    });
+    html += '<span style="font-size:12px;color:#2d5a8e;cursor:pointer;padding:4px 10px;border:1px dashed #2d5a8e;border-radius:12px;" onclick="showPreferenceModal()">+ 编辑偏好</span>';
+    html += '</div>';
+    html += '<div style="font-size:12px;color:#718096">基于 ' + browseLog.length + ' 条浏览行为，画像匹配度 <b style="color:#38a169;">' + Math.min(95, 60 + Math.floor(browseLog.length / 3)) + '%</b></div>';
+    html += '<button class="btn btn-outline btn-sm" style="margin-top:8px" onclick="openSub(\'demand\')">✏️ 更新需求</button></div>';
+
+    // 浏览历史摘要
+    if (browseLog.length > 0) {
+      html += '<div class="card"><div class="section-title"><span class="icon">👁️</span>最近浏览</div>';
+      const recent = browseLog.slice(-5).reverse();
+      const seen = new Set();
+      recent.forEach(b => {
+        const label = eventNames[b.event] || b.event;
+        if (!seen.has(label)) {
+          seen.add(label);
+          const time = new Date(b.timestamp);
+          const timeStr = time.toLocaleTimeString('zh-CN', { hour:'2-digit', minute:'2-digit' });
+          html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f7fafc;font-size:13px;">';
+          html += '<span>' + label + '</span><span style="color:#a0aec0;font-size:11px;">' + timeStr + '</span></div>';
+        }
+      });
+      html += '</div>';
+    }
+
+    // 评价记录
+    html += '<div class="card"><div class="section-title"><span class="icon">⭐</span>我的评价记录</div>';
+    evaluations.forEach(e => {
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f7fafc">';
+      html += '<div><div style="font-size:13px;font-weight:600">' + e.project + '</div><div style="font-size:11px;color:#718096">' + e.stage + ' · ' + e.date + '</div></div>';
+      html += '<div style="color:#f6ad55">' + renderStars(e.score) + ' ' + e.score + '</div>';
+      html += '</div>';
+    });
+    html += '<button class="btn btn-outline btn-sm" style="margin-top:8px" onclick="openSub(\'review\')">查看全部评价</button></div>';
+
+    // 菜单列表
+    html += '<div class="menu-list">';
+    html += '<div class="menu-item" onclick="openSub(\'design\')"><div class="left"><span>🎨</span> 我的设计方案</div><div class="right">›</div></div>';
+    html += '<div class="menu-item" onclick="openSub(\'notifications\')"><div class="left"><span>🔔</span> 消息通知</div><div class="right"><span class="badge-dot"></span> ›</div></div>';
+    html += '<div class="menu-item" onclick="openSub(\'invite\')"><div class="left"><span>📨</span> 邀请好友</div><div class="right">得奖励 ›</div></div>';
+    html += '<div class="menu-item" onclick="openSub(\'invest-guide\')"><div class="left"><span>📖</span> 投资指南</div><div class="right">›</div></div>';
+    html += '<div class="menu-item" onclick="openSub(\'faq\')"><div class="left"><span>❓</span> 帮助客服</div><div class="right">›</div></div>';
+    html += '<div class="menu-item" onclick="openSub(\'settings\')"><div class="left"><span>⚙️</span> 设置</div><div class="right">›</div></div>';
+    html += '</div>';
+  }
+
+  html += '</div>';
+  page.innerHTML = html;
+}
+
+// 偏好编辑弹窗
+function showPreferenceModal() {
+  const overlay = document.createElement('div');
+  overlay.id = 'prefOverlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#fff;width:90%;max-width:400px;border-radius:16px;padding:24px;max-height:80vh;overflow-y:auto;';
+  box.onclick = function(e) { e.stopPropagation(); };
+
+  const currentTags = userProfile.tags || [];
+  box.innerHTML = `
+    <h3 style="font-size:18px;font-weight:700;margin-bottom:16px;">编辑住房偏好</h3>
+    <p style="font-size:12px;color:#718096;margin-bottom:14px;">选择您感兴趣的标签，AI将更精准地为您推荐</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+      ${prefTags.map(t => {
+        const sel = currentTags.includes(t);
+        return '<span class="pref-tag-opt" data-tag="' + t + '" onclick="togglePrefTag(this)" style="padding:8px 14px;border:1.5px solid ' + (sel ? '#2d5a8e' : '#e2e8f0') + ';border-radius:20px;font-size:13px;cursor:pointer;transition:all 0.2s;background:' + (sel ? '#ebf4ff' : '#fff') + ';color:' + (sel ? '#2d5a8e' : '#4a5568') + ';">' + t + '</span>';
+      }).join('')}
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="document.getElementById('prefOverlay').remove()" style="flex:1;padding:12px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;font-size:14px;cursor:pointer;">取消</button>
+      <button onclick="savePreferences()" style="flex:2;padding:12px;border:none;border-radius:10px;background:#2d5a8e;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">保存偏好</button>
+    </div>
+  `;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+
+function togglePrefTag(el) {
+  const isSel = el.style.background === 'rgb(235, 244, 255)';
+  if (isSel) {
+    el.style.background = '#fff'; el.style.color = '#4a5568'; el.style.borderColor = '#e2e8f0';
+  } else {
+    el.style.background = '#ebf4ff'; el.style.color = '#2d5a8e'; el.style.borderColor = '#2d5a8e';
+  }
+}
+
+function savePreferences() {
+  const tags = [];
+  document.querySelectorAll('.pref-tag-opt').forEach(el => {
+    if (el.style.background === 'rgb(235, 244, 255)') tags.push(el.dataset.tag);
+  });
+  userProfile.tags = tags;
+  localStorage.setItem('hf_user_profile', JSON.stringify(userProfile));
+  document.getElementById('prefOverlay')?.remove();
+  showAppToast('偏好已保存，AI将更新推荐');
+  logBrowseEvent('pref_update', { tags });
+  renderMe();
+}
+
+// 子页面
+function openSub(name) {
+  const el = document.getElementById('sub-' + name);
+  if (!el) return;
+  let html = '';
+
+  switch (name) {
+    case 'notifications':
+      html += '<div class="sub-page-header"><span class="back" onclick="closeSub(\'' + name + '\')">← 返回</span><h3>消息通知</h3></div>';
+      html += '<div style="padding:16px">';
+      notifications.forEach(n => {
+        html += '<div class="notif-item' + (n.read ? '' : ' unread') + '">';
+        html += '<div class="notif-icon">' + n.icon + '</div>';
+        html += '<div class="notif-content"><div class="notif-title">' + n.title + '</div>';
+        html += '<div class="notif-text">' + n.text + '</div><div class="notif-time">' + n.time + '</div></div></div>';
+      });
+      html += '</div>';
+      break;
+
+    case 'invest-guide':
+      html += '<div class="sub-page-header"><span class="back" onclick="closeSub(\'' + name + '\')">← 返回</span><h3>投资指南</h3></div>';
+      html += '<div style="padding:16px">';
+      investGuide.forEach(g => {
+        html += '<div class="card"><div style="font-weight:700;font-size:15px;margin-bottom:8px">' + g.title + '</div>';
+        html += '<div style="font-size:13px;color:#718096;line-height:1.6">' + g.content + '</div></div>';
+      });
+      html += '</div>';
+      break;
+
+    case 'faq':
+      html += '<div class="sub-page-header"><span class="back" onclick="closeSub(\'' + name + '\')">← 返回</span><h3>帮助客服</h3></div>';
+      html += '<div style="padding:16px">';
+      faqs.forEach((f, i) => {
+        const open = expandedFaqs[i];
+        html += '<div class="faq-item"><div class="faq-q" onclick="toggleFaq(' + i + ')"><span>' + f.q + '</span><span>' + (open ? '▲' : '▼') + '</span></div>';
+        html += '<div class="faq-a' + (open ? ' open' : '') + '">' + f.a + '</div></div>';
+      });
+      html += '</div>';
+      break;
+
+    case 'demand':
+      html += '<div class="sub-page-header"><span class="back" onclick="closeSub(\'' + name + '\')">← 返回</span><h3>表达住房需求</h3></div>';
+      html += '<div style="padding:16px">';
+      html += '<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:10px">💬 描述您的理想居住需求</div>';
+      html += '<textarea class="form-input" rows="4" placeholder="例如：我需要一套四房两厅的房子，希望在地铁沿线，预算500万左右，最好有好的学区..."></textarea>';
+      html += '<div style="font-size:12px;color:#718096;margin-bottom:10px">AI将分析您的需求并匹配合适的项目</div>';
+      html += '<button class="btn btn-primary" style="width:100%" onclick="showAppToast(\'需求分析已提交，AI正在为您匹配最佳方案\')">提交需求分析</button></div>';
+      html += '</div>';
+      break;
+
+    case 'invite':
+      html += '<div class="sub-page-header"><span class="back" onclick="closeSub(\'' + name + '\')">← 返回</span><h3>邀请好友</h3></div>';
+      html += '<div style="padding:16px;text-align:center">';
+      html += '<div class="card"><div style="font-size:40px;margin-bottom:10px">🎁</div>';
+      html += '<div style="font-size:16px;font-weight:700;margin-bottom:6px">邀请好友加入房找人</div>';
+      html += '<div style="font-size:13px;color:#718096;margin-bottom:10px">每成功邀请1位好友，双方各得500元购房基金</div>';
+      html += '<button class="btn btn-orange" onclick="showAppToast(\'邀请链接已复制到剪贴板\')">📤 分享邀请链接</button></div>';
+      html += '</div>';
+      break;
+
+    case 'settings':
+      html += '<div class="sub-page-header"><span class="back" onclick="closeSub(\'' + name + '\')">← 返回</span><h3>设置</h3></div>';
+      html += '<div style="padding:16px">';
+      const settings = ['个人信息', '账号安全', '实名认证', '通知设置', '隐私设置', '关于房找人', '退出登录'];
+      settings.forEach(s => {
+        html += '<div class="card-sm" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">';
+        html += '<span style="font-size:14px">' + s + '</span><span style="color:#a0aec0">›</span></div>';
+      });
+      html += '</div>';
+      break;
+
+    case 'service':
+      html += '<div class="sub-page-header"><span class="back" onclick="closeSub(\'' + name + '\')">← 返回</span><h3>客服中心</h3></div>';
+      html += '<div style="padding:16px">';
+      html += '<div class="card" style="text-align:center"><div style="font-size:40px;margin-bottom:8px">💬</div>';
+      html += '<div style="font-size:15px;font-weight:700">在线客服</div><div style="font-size:12px;color:#718096">工作时间 9:00-21:00</div></div>';
+      html += '</div>';
+      break;
+
+    case 'design':
+      html += '<div class="sub-page-header"><span class="back" onclick="closeSub(\'' + name + '\')">← 返回</span><h3>我的设计方案</h3></div>';
+      html += '<div style="padding:16px">';
+      html += '<div class="card"><div style="display:flex;align-items:center;gap:12px"><div style="font-size:32px">🏘️</div>';
+      html += '<div><div style="font-weight:700">翡翠湾花园 · 定制方案</div><div style="font-size:12px;color:#718096">户型: 四房两厅两卫 | 风格: 现代简约 | 智能: 全屋智能</div></div></div></div>';
+      html += '<div class="card"><div style="display:flex;align-items:center;gap:12px"><div style="font-size:32px">🏔️</div>';
+      html += '<div><div style="font-weight:700">云栖山居 · 定制方案</div><div style="font-size:12px;color:#718096">户型: 四房两厅三卫 | 风格: 新中式 | 庭院: 中式庭院</div></div></div></div>';
+      html += '</div>';
+      break;
+
+    case 'review':
+      html += '<div class="sub-page-header"><span class="back" onclick="closeSub(\'' + name + '\')">← 返回</span><h3>评价记录</h3></div>';
+      html += '<div style="padding:16px">';
+      evaluations.forEach(e => {
+        html += '<div class="eval-card"><div class="eval-header">';
+        html += '<div class="eval-avatar">' + e.user[0] + '</div>';
+        html += '<div><div style="font-size:14px;font-weight:600">' + e.user + '</div>';
+        html += '<div style="font-size:11px;color:#a0aec0">' + e.project + ' · ' + e.stage + '</div></div>';
+        html += '<div class="eval-stars" style="margin-left:auto">' + renderStars(e.score) + ' ' + e.score + '</div></div>';
+        html += '<div class="eval-text">' + e.text + '</div><div class="eval-meta">' + e.date + '</div></div>';
+      });
+      html += '</div>';
+      break;
+  }
+
+  el.innerHTML = html;
+  el.classList.add('open');
+}
+
+function closeSub(name) {
+  document.getElementById('sub-' + name).classList.remove('open');
+  if (name === 'faq') expandedFaqs = {};
+}
+
+function toggleFaq(idx) {
+  expandedFaqs[idx] = !expandedFaqs[idx];
+  openSub('faq');
+}
+
+// Tab导航
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-item[data-tab="' + tab + '"]').forEach(t => t.classList.add('active'));
+
+  if (tab === 'discover') renderDiscover();
+  else if (tab === 'projects') renderProjects();
+  else if (tab === 'cocreate') renderCocreate();
+  else if (tab === 'invest') renderInvest();
+  else if (tab === 'me') renderMe();
+
+  if (tab !== 'discover' && carouselTimer) {
+    clearInterval(carouselTimer);
+    carouselTimer = null;
+  }
+}
+
+// 渲染底部Tab栏
+function renderTabBar() {
+  const bar = document.getElementById('tab-bar');
+  const tabs = [
+    { id: 'discover', icon: '🏠', label: '发现' },
+    { id: 'projects', icon: '📋', label: '我的项目' },
+    { id: 'cocreate', icon: '🤝', label: '共创' },
+    { id: 'invest', icon: '💰', label: '投资' },
+    { id: 'me', icon: '👤', label: '我的' },
+  ];
+  bar.innerHTML = tabs.map(t =>
+    '<div class="tab-item' + (t.id === currentTab ? ' active' : '') + '" data-tab="' + t.id + '" onclick="switchTab(\'' + t.id + '\')">' +
+    '<div class="tab-icon">' + t.icon + '</div>' +
+    '<div class="tab-label">' + t.label + '</div></div>'
+  ).join('');
+}
+
+// 初始化
+renderTabBar();
+renderDiscover();
+
+// Toast提示
+function showAppToast(msg) {
+  let t = document.getElementById('appToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'appToast';
+    t.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#1a365d;color:#fff;padding:12px 28px;border-radius:24px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.25);max-width:350px;text-align:center;transition:all 0.3s;opacity:0;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.bottom = '100px';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.bottom = '80px'; }, 2000);
+}
+
+function postCommunityMsg() {
+  const input = document.querySelector('#communityInput');
+  if (input && input.value.trim()) {
+    showAppToast('帖子发布成功！');
+    input.value = '';
+  } else {
+    showAppToast('请输入内容后再发布');
+  }
+}
+
+function voteOption(vi, name) {
+  showAppToast('你已投票给「' + name + '」，感谢参与！');
+  setTimeout(() => switchCocreateTab('votes'), 500);
+}
+
+// ====== 会员登录与浏览追踪系统 ======
+
+// 登录弹窗
+function showLoginModal(mode) {
+  // mode: 'login' | 'register' | 'bind'
+  const overlay = document.createElement('div');
+  overlay.id = 'loginOverlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:flex-end;justify-content:center;';
+  overlay.onclick = function(e) { if (e.target === overlay) closeLoginModal(); };
+
+  const sheet = document.createElement('div');
+  sheet.style.cssText = 'background:#fff;width:100%;max-width:430px;border-radius:20px 20px 0 0;padding:24px 20px 32px;animation:slideUp 0.3s ease;';
+  sheet.onclick = function(e) { e.stopPropagation(); };
+
+  const titles = { login:'登录房找人', register:'注册会员', bind:'绑定手机号' };
+  const isReg = mode === 'register';
+
+  sheet.innerHTML = `
+    <style>
+      @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    </style>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <h3 style="font-size:20px;font-weight:700;">${titles[mode] || '登录'}</h3>
+      <span style="font-size:24px;cursor:pointer;color:#a0aec0;" onclick="closeLoginModal()">✕</span>
+    </div>
+    <div style="font-size:12px;color:#718096;margin-bottom:16px;">登录即表示同意《用户协议》和《隐私政策》</div>
+
+    <!-- 手机号 -->
+    <div style="margin-bottom:14px;">
+      <label style="font-size:13px;font-weight:600;color:#4a5568;display:block;margin-bottom:6px;">手机号</label>
+      <input id="loginPhone" type="tel" maxlength="11" placeholder="请输入手机号" style="width:100%;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;outline:none;transition:border 0.2s;" onfocus="this.style.borderColor='#2d5a8e'" onblur="this.style.borderColor='#e2e8f0'">
+    </div>
+
+    <!-- 验证码 -->
+    <div style="margin-bottom:14px;display:flex;gap:10px;">
+      <input id="loginCode" type="text" maxlength="6" placeholder="验证码" style="flex:1;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;outline:none;" onfocus="this.style.borderColor='#2d5a8e'" onblur="this.style.borderColor='#e2e8f0'">
+      <button id="sendCodeBtn" onclick="sendLoginCode()" style="white-space:nowrap;padding:12px 16px;background:#ed8936;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">获取验证码</button>
+    </div>
+
+    ${isReg ? `
+    <!-- 注册额外字段 -->
+    <div style="margin-bottom:14px;">
+      <label style="font-size:13px;font-weight:600;color:#4a5568;display:block;margin-bottom:6px;">昵称</label>
+      <input id="regNickname" type="text" placeholder="给自己取个昵称" style="width:100%;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;outline:none;" onfocus="this.style.borderColor='#2d5a8e'" onblur="this.style.borderColor='#e2e8f0'">
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="font-size:13px;font-weight:600;color:#4a5568;display:block;margin-bottom:6px;">感兴趣的标签（可多选）</label>
+      <div id="regTags" style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${prefTags.map(t => `<span class="reg-tag" data-tag="${t}" onclick="toggleRegTag(this)" style="padding:6px 12px;border:1px solid #e2e8f0;border-radius:16px;font-size:12px;cursor:pointer;transition:all 0.2s;">${t}</span>`).join('')}
+      </div>
+    </div>
+    ` : ''}
+
+    <!-- 登录按钮 -->
+    <button onclick="doLogin('${mode}')" style="width:100%;padding:14px;background:linear-gradient(135deg,#1a365d,#2d5a8e);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;">${isReg ? '注册并登录' : '登录'}</button>
+
+    <!-- 微信登录 -->
+    <div style="text-align:center;margin-top:16px;">
+      <div style="font-size:12px;color:#a0aec0;margin-bottom:10px;">其他登录方式</div>
+      <button onclick="wechatLogin()" style="width:48px;height:48px;border-radius:50%;background:#07c160;color:#fff;border:none;font-size:22px;cursor:pointer;">💬</button>
+      <div style="font-size:11px;color:#718096;margin-top:4px;">微信</div>
+    </div>
+
+    <!-- 切换 -->
+    <div style="text-align:center;margin-top:12px;font-size:13px;color:#718096;">
+      ${isReg ? '已有账号？<span style="color:#2d5a8e;font-weight:600;cursor:pointer;" onclick="closeLoginModal();showLoginModal(\'login\')">去登录</span>' : '还没有账号？<span style="color:#2d5a8e;font-weight:600;cursor:pointer;" onclick="closeLoginModal();showLoginModal(\'register\')">立即注册</span>'}
+    </div>
+  `;
+
+  overlay.appendChild(sheet);
+  document.body.appendChild(overlay);
+}
+
+function toggleRegTag(el) {
+  el.classList.toggle('selected');
+  if (el.classList.contains('selected')) {
+    el.style.background = '#2d5a8e'; el.style.color = '#fff'; el.style.borderColor = '#2d5a8e';
+  } else {
+    el.style.background = '#fff'; el.style.color = '#4a5568'; el.style.borderColor = '#e2e8f0';
+  }
+}
+
+function closeLoginModal() {
+  const overlay = document.getElementById('loginOverlay');
+  if (overlay) overlay.remove();
+}
+
+let codeTimer = null;
+function sendLoginCode() {
+  const phone = document.getElementById('loginPhone')?.value;
+  if (!phone || phone.length !== 11) { showAppToast('请输入正确的手机号'); return; }
+  const btn = document.getElementById('sendCodeBtn');
+  let sec = 60;
+  btn.disabled = true;
+  btn.style.opacity = '0.6';
+  showAppToast('验证码已发送（演示：输入任意6位数字）');
+  codeTimer = setInterval(() => {
+    sec--;
+    btn.textContent = sec + 's后重发';
+    if (sec <= 0) { clearInterval(codeTimer); btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '获取验证码'; }
+  }, 1000);
+}
+
+function doLogin(mode) {
+  const phone = document.getElementById('loginPhone')?.value;
+  const code = document.getElementById('loginCode')?.value;
+  if (!phone || phone.length !== 11) { showAppToast('请输入正确的手机号'); return; }
+  if (!code || code.length < 4) { showAppToast('请输入验证码'); return; }
+
+  // 模拟登录
+  let user = mockUsers[phone];
+  if (!user) {
+    if (mode === 'register') {
+      const nickname = document.getElementById('regNickname')?.value || '新用户';
+      const selectedTags = [];
+      document.querySelectorAll('.reg-tag.selected').forEach(t => selectedTags.push(t.dataset.tag));
+      user = {
+        name: nickname, id: 'FZR' + Date.now().toString(36).toUpperCase(), tier: 'bronze',
+        avatar: nickname[0], phone: phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'),
+        invest: 0, projects: [], joinDate: new Date().toISOString().slice(0,7), points: 100
+      };
+      // 保存偏好标签
+      if (selectedTags.length > 0) {
+        userProfile.tags = selectedTags;
+        userProfile.prefs = { registeredVia:'mobile', source:'register' };
+        localStorage.setItem('hf_user_profile', JSON.stringify(userProfile));
+      }
+    } else {
+      // 新手机号但选了登录模式 → 自动注册
+      user = {
+        name: '用户' + phone.slice(-4), id: 'FZR' + Date.now().toString(36).toUpperCase(), tier: 'bronze',
+        avatar: '新', phone: phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'),
+        invest: 0, projects: [], joinDate: new Date().toISOString().slice(0,7), points: 50
+      };
+    }
+  }
+
+  currentUser = user;
+  isLoggedIn = true;
+  localStorage.setItem('hf_current_user', JSON.stringify(user));
+  localStorage.setItem('hf_is_logged_in', 'true');
+  closeLoginModal();
+  showAppToast('🎉 欢迎回来，' + user.name + '！');
+  logBrowseEvent('login', { phone: phone.slice(-4), mode });
+
+  // 刷新相关页面
+  if (currentTab === 'me') renderMe();
+  if (currentTab === 'discover') renderDiscover();
+}
+
+function wechatLogin() {
+  showAppToast('微信登录功能需配置AppID后启用（演示模式）');
+  // 模拟微信OAuth
+  const mockWxUser = { name:'微信用户', id:'FZR_WX' + Date.now().toString(36).toUpperCase(), tier:'bronze', avatar:'微', phone:'未绑定', invest:0, projects:[], joinDate:new Date().toISOString().slice(0,7), points:50 };
+  currentUser = mockWxUser;
+  isLoggedIn = true;
+  localStorage.setItem('hf_current_user', JSON.stringify(mockWxUser));
+  localStorage.setItem('hf_is_logged_in', 'true');
+  closeLoginModal();
+  showAppToast('🎉 微信登录成功！建议绑定手机号');
+  logBrowseEvent('login', { method:'wechat' });
+  if (currentTab === 'me') renderMe();
+  if (currentTab === 'discover') renderDiscover();
+}
+
+function doLogout() {
+  currentUser = null;
+  isLoggedIn = false;
+  localStorage.removeItem('hf_current_user');
+  localStorage.setItem('hf_is_logged_in', 'false');
+  showAppToast('已退出登录');
+  renderMe();
+  renderDiscover();
+}
+
+// ====== 浏览行为追踪 ======
+function logBrowseEvent(event, detail) {
+  const entry = {
+    event, detail: detail || {},
+    page: currentTab || 'unknown',
+    timestamp: Date.now(),
+    sessionId: localStorage.getItem('hf_session_id') || generateSessionId()
+  };
+  browseLog.push(entry);
+  // 保留最近1000条
+  if (browseLog.length > 1000) browseLog = browseLog.slice(-1000);
+  localStorage.setItem('hf_browse_log', JSON.stringify(browseLog));
+
+  // 更新用户画像分数
+  updateProfileScore(event, detail);
+}
+
+function generateSessionId() {
+  const sid = 'S' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  localStorage.setItem('hf_session_id', sid);
+  return sid;
+}
+
+function updateProfileScore(event, detail) {
+  const scores = { view_project:5, view_video:3, click_demand:10, click_invest:8, search:5, share:15, rate:20, stay:2, favorite:10, login:15 };
+  userProfile.score = (userProfile.score || 0) + (scores[event] || 1);
+  // 记录偏好
+  if (detail && detail.tag) {
+    if (!userProfile.prefs.tags) userProfile.prefs.tags = {};
+    userProfile.prefs.tags[detail.tag] = (userProfile.prefs.tags[detail.tag] || 0) + 1;
+  }
+  localStorage.setItem('hf_user_profile', JSON.stringify(userProfile));
+}
+
+// 页面浏览追踪（自动）
+function trackPageView(page) {
+  if (!isLoggedIn) return;
+  logBrowseEvent('view_page', { page });
+  // 如果页面有关联的项目数据
+  if (page === 'projects' || page === 'discover') {
+    logBrowseEvent('view_project_list', { source: page });
+  }
+}
+
+// 初始化：恢复登录态
+(function initAuth() {
+  const saved = localStorage.getItem('hf_current_user');
+  const logged = localStorage.getItem('hf_is_logged_in');
+  if (saved && logged === 'true') {
+    try { currentUser = JSON.parse(saved); isLoggedIn = true; } catch(e) {}
+  }
+  // 生成或恢复session
+  if (!localStorage.getItem('hf_session_id')) generateSessionId();
+})();
+
+// ====== 语音指令执行系统 ======
+// 语音命令 → 直接执行UI操作（非朗读按钮文字）
+const Voice = {
+  listening: false,
+  enabled: true,
+  recognition: null,
+  synth: window.speechSynthesis,
+
+  init() {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      console.log('语音识别不支持，使用文本输入模式');
+      this.createUI();
+      return;
+    }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    this.recognition = new SR();
+    this.recognition.lang = 'zh-CN';
+    this.recognition.continuous = false;
+    this.recognition.interimResults = false;
+    this.recognition.onresult = (e) => {
+      const cmd = e.results[0][0].transcript.trim();
+      this.handleCommand(cmd);
+    };
+    this.recognition.onend = () => { this.listening = false; this.updateBtn(); };
+    this.recognition.onerror = () => { this.listening = false; this.updateBtn(); };
+    this.createUI();
+  },
+
+  speak(text, rate) {
+    if (!this.enabled || !this.synth) return;
+    this.synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'zh-CN'; u.rate = rate || 1; u.volume = 0.9;
+    this.synth.speak(u);
+  },
+
+  handleCommand(cmd) {
+    showAppToast('🎤 ' + cmd);
+    const c = cmd.toLowerCase().replace(/\s+/g, '');
+
+    // ===== Tab 导航 =====
+    if (c.includes('发现') || c.includes('首页') || c.includes('主页')) { switchTab('discover'); this.speak('发现页面'); return; }
+    if ((c.includes('我的项目') || c.includes('项目列表')) && !c.includes('详情')) { switchTab('projects'); this.speak('我的项目'); return; }
+    if (c.includes('共创') || c.includes('设计') && !c.includes('详情')) { switchTab('cocreate'); this.speak('共创设计'); return; }
+    if (c.includes('投资') || c.includes('理财') || c.includes('lp')) { switchTab('invest'); this.speak('投资管理'); return; }
+    if (c.includes('我的') || c.includes('个人') || c.includes('个人中心')) { switchTab('me'); this.speak('个人中心'); return; }
+
+    // ===== 共创子Tab切换 =====
+    if (c.includes('模块配置') || c.includes('配置模块')) { switchCocreateTab('modules'); this.speak('模块配置'); return; }
+    if (c.includes('方案投票') || c.includes('投票')) { switchCocreateTab('votes'); this.speak('方案投票'); return; }
+    if (c.includes('社群') || c.includes('讨论') || c.includes('社群讨论')) { switchCocreateTab('community'); this.speak('社群讨论'); return; }
+
+    // ===== 投资子Tab切换 =====
+    if (c.includes('投资总览') || c.includes('总览')) { if (typeof switchInvestTab === 'function') { switchInvestTab('overview'); this.speak('投资总览'); } return; }
+    if (c.includes('投资项目') || c.includes('lp项目')) { if (typeof switchInvestTab === 'function') { switchInvestTab('projects'); this.speak('投资项目'); } return; }
+    if (c.includes('流水') || c.includes('交易') || c.includes('交易记录')) { if (typeof switchInvestTab === 'function') { switchInvestTab('transactions'); this.speak('交易流水'); } return; }
+
+    // ===== 项目详情：通过项目名关键词打开 =====
+    const projectKW = [
+      { kw: ['翡翠湾','翡翠','翡翠湾花园'], id: 'p1' },
+      { kw: ['云栖','云栖山居'], id: 'p2' },
+      { kw: ['星耀','星耀城'], id: 'p3' },
+      { kw: ['钱江','钱江世纪城','世纪城'], id: 'p3' },
+    ];
+    for (const pk of projectKW) {
+      for (const k of pk.kw) {
+        if (c.includes(k)) { openProjectDetail(pk.id); this.speak('已打开项目详情'); return; }
+      }
+    }
+
+    // ===== 子页面打开 =====
+    if (c.includes('消息') || c.includes('通知')) { openSub('notifications'); this.speak('消息通知'); return; }
+    if (c.includes('投资指南') || c.includes('投资说明')) { openSub('invest-guide'); this.speak('投资指南'); return; }
+    if (c.includes('帮助') || c.includes('客服') || c.includes('常见问题')) { openSub('faq'); this.speak('帮助客服'); return; }
+    if (c.includes('需求') || c.includes('表达需求') || c.includes('提交需求')) { openSub('demand'); this.speak('需求提交'); return; }
+    if (c.includes('邀请') || c.includes('分享') || c.includes('好友')) { openSub('invite'); this.speak('邀请好友'); return; }
+    if (c.includes('设计') && c.includes('方案') && !c.includes('投票')) { openSub('design'); this.speak('我的设计方案'); return; }
+    if (c.includes('评价') || c.includes('评价记录') || c.includes('我的评价')) { openSub('review'); this.speak('评价记录'); return; }
+    if (c.includes('设置') || c.includes('配置')) { openSub('settings'); this.speak('设置'); return; }
+
+    // ===== 会员与登录 =====
+    if (c.includes('登录') || c.includes('登陆') || c.includes('注册') || c.includes('signin')) { showLoginModal('login'); this.speak('请登录'); return; }
+    if (c.includes('退出') || c.includes('登出') || c.includes('注销')) { doLogout(); this.speak('已退出'); return; }
+    if (c.includes('偏好') || c.includes('编辑偏好') || c.includes('修改偏好')) {
+      if (isLoggedIn) { showPreferenceModal(); this.speak('编辑偏好'); }
+      else { this.speak('请先登录'); }
+      return;
+    }
+
+    // ===== 操作指令 =====
+    if (c.includes('直播') || c.includes('工地直播') || c.includes('观看直播')) {
+      // 如果当前在项目详情页
+      const sub = document.getElementById('sub-project-detail');
+      if (sub && sub.style.display !== 'none') { showAppToast('正在连接工地直播...'); this.speak('正在连接工地直播'); }
+      else { this.speak('请先打开一个项目详情'); }
+      return;
+    }
+    if (c.includes('提交需求') || c.includes('发送需求')) {
+      const sub = document.getElementById('sub-demand');
+      if (sub && sub.style.display !== 'none') {
+        showAppToast('需求分析已提交，AI正在为您匹配最佳方案');
+        this.speak('需求已提交');
+      } else { openSub('demand'); this.speak('请填写需求后提交'); }
+      return;
+    }
+    if (c.includes('发布') || c.includes('发帖')) {
+      const input = document.querySelector('#communityInput');
+      if (input && input.value.trim()) { postCommunityMsg(); this.speak('帖子已发布'); }
+      else { this.speak('请先输入帖子内容'); }
+      return;
+    }
+
+    // ===== 滚动 =====
+    if (c.includes('向上') || c.includes('顶部') || c.includes('回到顶部')) { document.getElementById('app').scrollTo({top:0,behavior:'smooth'}); this.speak('已回到顶部'); return; }
+    if (c.includes('向下') || c.includes('底部') || c.includes('滚动到底')) { document.getElementById('app').scrollTo({top:9999,behavior:'smooth'}); this.speak('已滚动到底部'); return; }
+
+    // ===== 返回 =====
+    if (c.includes('返回') || c.includes('后退') || c.includes('关闭')) {
+      // 检查是否有打开的子页面
+      const subs = ['notifications','invest-guide','faq','demand','invite','design','review','settings','project-detail'];
+      let closed = false;
+      for (const s of subs) {
+        const el = document.getElementById('sub-' + s);
+        if (el && el.style.display !== 'none') { closeSub(s); closed = true; break; }
+      }
+      if (closed) { this.speak('已返回'); }
+      else { this.speak('已在主页面'); }
+      return;
+    }
+
+    // ===== 帮助 =====
+    if (c.includes('帮助') || c.includes('能做什么') || c.includes('功能') || c.includes('指令')) {
+      this.speak('你可以通过语音：切换页面如「发现」「我的项目」「共创」「投资」「我的」；打开项目如「翡翠湾花园」「云栖山居」；打开功能如「消息」「投资指南」「提交需求」「帮助客服」；操作如「回到顶部」「返回」。');
+      return;
+    }
+
+    // 兜底
+    this.speak('没有听懂，请再说一次。试试说「帮助」了解语音指令。');
+  },
+
+  toggleListen() {
+    if (this.listening) { this.recognition.stop(); this.listening = false; }
+    else { this.recognition.start(); this.listening = true; this.speak('请说指令'); }
+    this.updateBtn();
+  },
+
+  toggleSpeak() { this.enabled = !this.enabled; this.updateBtn(); if(!this.enabled && this.synth) this.synth.cancel(); },
+
+  updateBtn() {
+    const b = document.getElementById('voiceBtn');
+    if (!b) return;
+    b.style.background = this.listening ? '#e53e3e' : '#1a365d';
+    b.innerHTML = this.listening ? '🎤⋯' : '🎤';
+  },
+
+  createUI() {
+    const el = document.createElement('div');
+    el.id = 'voiceUI';
+    el.innerHTML = `
+      <style>
+        #voiceBtn { position:fixed; right:16px; bottom:140px; width:48px; height:48px; border-radius:50%; background:#1a365d; color:#fff; border:none; font-size:20px; cursor:pointer; z-index:9998; box-shadow:0 4px 16px rgba(0,0,0,0.2); display:flex; align-items:center; justify-content:center; transition:all 0.3s; }
+        #voiceBtn:hover { transform:scale(1.1); }
+        #voiceBtn.listening { animation: voicePulse 1s infinite; background:#e53e3e; }
+        #voiceMute { position:fixed; right:16px; bottom:196px; width:36px; height:36px; border-radius:50%; background:#fff; color:#718096; border:1px solid #e2e8f0; font-size:14px; cursor:pointer; z-index:9998; box-shadow:0 2px 8px rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; }
+        #voiceTip { position:fixed; right:70px; bottom:150px; background:#1a365d; color:#fff; padding:6px 12px; border-radius:16px; font-size:11px; z-index:9997; opacity:0; transition:opacity 0.3s; pointer-events:none; white-space:nowrap; max-width:200px; }
+        @keyframes voicePulse { 0%,100%{box-shadow:0 0 0 0 rgba(229,62,62,0.4)} 50%{box-shadow:0 0 0 12px rgba(229,62,62,0)} }
+      </style>
+      <div id="voiceTip">点击麦克风🎤说出指令</div>
+      <button id="voiceMute" onclick="Voice.toggleSpeak()" title="语音反馈开关">🔊</button>
+      <button id="voiceBtn" onclick="Voice.toggleListen()" title="语音指令（点击说话）">🎤</button>
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => { const t = document.getElementById('voiceTip'); if (t) { t.style.opacity = '1'; setTimeout(() => { t.style.opacity = '0'; }, 5000); } }, 1500);
+  }
+};
+
+// 注意：已移除 hover 朗读功能。语音系统现在根据语言指令执行具体任务。
+// 页面切换时的播报保留（仅作确认反馈）
+const origSwitchTab = switchTab;
+switchTab = function(tab) {
+  origSwitchTab(tab);
+  const labels = {discover:'发现页面', projects:'我的项目', cocreate:'共创设计', invest:'投资管理', me:'个人中心'};
+  Voice.speak(labels[tab] || tab, 1.2);
+};
+
+// 初始化
+setTimeout(() => Voice.init(), 1000);
+</script>
+</body>
+</html>
