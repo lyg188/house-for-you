@@ -1,2 +1,15 @@
+node_modules/
+admin/
+app/
+dist/admin/
+dist/app/
+dist/assets/
+dist/mobile/
+dist/preview/
+dist/.netlify/
+dist/netlify.toml
+dist/netlify.toml.json
+dist/playwright-cli.json
+index.html
 .public_url
 daemon.py
