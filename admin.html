@@ -1,0 +1,2437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>房找人 - GP管理后台</title>
+<style>
+:root {
+  --brand-deep: #1a365d;
+  --brand-blue: #2d5a8e;
+  --brand-orange: #ed8936;
+  --brand-green: #38a169;
+  --red: #e53e3e;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background:#f7fafc; color:#2d3748; display:flex; min-height:100vh; }
+
+/* 汉堡菜单按钮（默认隐藏，手机端显示） */
+.hamburger { display:none; position:fixed; top:0; left:0; z-index:200; width:48px; height:48px; background:#1a365d; color:#fff; border:none; font-size:22px; cursor:pointer; align-items:center; justify-content:center; border-radius:0 0 12px 0; }
+.sidebar-overlay { display:none; position:fixed; top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:99; }
+
+/* 侧边栏 */
+.sidebar { width:256px; min-width:256px; background: linear-gradient(180deg, #1a365d 0%, #1e4d8c 100%); color:#fff; display:flex; flex-direction:column; position:fixed; left:0; top:0; bottom:0; z-index:100; }
+.sidebar-logo { padding:24px 20px; border-bottom:1px solid rgba(255,255,255,0.1); }
+.sidebar-logo h1 { font-size:20px; font-weight:700; letter-spacing:1px; }
+.sidebar-logo p { font-size:12px; color:rgba(255,255,255,0.6); margin-top:4px; }
+.sidebar-nav { flex:1; padding:12px 0; overflow-y:auto; }
+.nav-item { display:flex; align-items:center; padding:12px 20px; cursor:pointer; transition:all 0.2s; font-size:14px; color:rgba(255,255,255,0.7); border-right:3px solid transparent; }
+.nav-item:hover { background:rgba(255,255,255,0.08); color:#fff; }
+.nav-item.active { background:rgba(255,255,255,0.12); color:#fff; border-right-color:#ed8936; }
+.nav-item .nav-icon { font-size:18px; margin-right:12px; width:24px; text-align:center; }
+.sidebar-footer { padding:16px 20px; border-top:1px solid rgba(255,255,255,0.1); font-size:12px; }
+.sidebar-footer .user-info { display:flex; align-items:center; gap:10px; }
+.sidebar-footer .avatar { width:36px; height:36px; border-radius:50%; background:#ed8936; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:600; }
+
+/* 主内容区 */
+.main { margin-left:256px; flex:1; display:flex; flex-direction:column; min-height:100vh; }
+.header { background:#fff; padding:16px 32px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; }
+.header h2 { font-size:20px; font-weight:600; }
+.header-right { display:flex; align-items:center; gap:20px; font-size:14px; }
+.header-right .notify { position:relative; cursor:pointer; font-size:18px; }
+.header-right .notify .badge { position:absolute; top:-6px; right:-6px; width:18px; height:18px; background:#e53e3e; border-radius:50%; font-size:10px; display:flex; align-items:center; justify-content:center; color:#fff; }
+.content { flex:1; padding:24px 32px; overflow-y:auto; }
+.page { display:none; }
+.page.active { display:block; }
+
+/* 通用组件 */
+.card { background:#fff; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); padding:24px; margin-bottom:20px; }
+.card-title { font-size:16px; font-weight:600; margin-bottom:16px; color:#1a365d; }
+.stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
+.stat-card { background:#fff; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); padding:20px; display:flex; align-items:center; gap:16px; }
+.stat-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; }
+.stat-value { font-size:24px; font-weight:700; color:#1a365d; }
+.stat-label { font-size:13px; color:#718096; margin-top:2px; }
+
+.btn { padding:8px 16px; border-radius:8px; border:none; cursor:pointer; font-size:13px; font-weight:500; transition:all 0.2s; }
+.btn-primary { background:#ed8936; color:#fff; }
+.btn-primary:hover { background:#dd6b20; }
+.btn-outline { background:#fff; color:#4a5568; border:1px solid #e2e8f0; }
+.btn-outline:hover { border-color:#a0aec0; }
+.btn-sm { padding:4px 10px; font-size:12px; }
+
+.tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:500; }
+.tag-blue { background:#ebf4ff; color:#2b6cb0; }
+.tag-green { background:#f0fff4; color:#276749; }
+.tag-orange { background:#fffaf0; color:#c05621; }
+.tag-purple { background:#faf5ff; color:#6b46c1; }
+.tag-pink { background:#fff5f7; color:#b83280; }
+.tag-teal { background:#e6fffa; color:#285e61; }
+
+.dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px; }
+.dot-green { background:#38a169; }
+.dot-yellow { background:#ecc94b; }
+.dot-red { background:#e53e3e; }
+
+/* 两列布局 */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+
+/* 进度条 */
+.progress-bar { height:8px; background:#edf2f7; border-radius:4px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:4px; transition:width 0.3s; }
+
+/* 柱状图 */
+.bar-chart { display:flex; align-items:flex-end; gap:8px; height:200px; padding:0 10px; }
+.bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.bar { width:100%; border-radius:6px 6px 0 0; transition:height 0.3s; }
+.bar-label { font-size:11px; color:#718096; }
+
+/* 表格 */
+table { width:100%; border-collapse:collapse; }
+th { text-align:left; padding:12px 16px; font-size:12px; font-weight:600; color:#718096; text-transform:uppercase; border-bottom:1px solid #e2e8f0; background:#f7fafc; }
+td { padding:12px 16px; font-size:13px; border-bottom:1px solid #f0f0f5; }
+tr:hover td { background:#f7fafc; }
+
+/* 子tab */
+.subtabs { display:flex; gap:8px; margin-bottom:20px; border-bottom:2px solid #e2e8f0; }
+.subtab { padding:8px 16px; cursor:pointer; font-size:14px; color:#718096; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
+.subtab:hover { color:#2d3748; }
+.subtab.active { color:#ed8936; border-bottom-color:#ed8936; font-weight:600; }
+.subtab-content { display:none; }
+.subtab-content.active { display:block; }
+
+/* 协同办公子tab */
+.subtab-bar { display:flex; gap:6px; margin-bottom:20px; background:#fff; padding:4px; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+.collab-tab { padding:8px 20px; cursor:pointer; font-size:13px; color:#718096; border:none; background:none; border-radius:8px; transition:all 0.2s; font-weight:500; }
+.collab-tab:hover { color:#2d3748; background:#f7fafc; }
+.collab-tab.active { color:#fff; background:var(--brand-deep); font-weight:600; }
+.collab-content { display:none; }
+.collab-content.active { display:block; }
+
+/* 卡片头部 */
+.card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #f0f0f5; }
+.card-header h3 { font-size:16px; font-weight:700; color:#1a202c; }
+
+/* 标签扩展 */
+.tag-red { background:#fef2f2; color:#c53030; }
+.tag-gray { background:#f7fafc; color:#718096; }
+
+/* 两栏布局 */
+.flex-grid { display:grid; gap:16px; }
+
+/* 热力图 */
+.heatmap-item { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f0f0f5; }
+.heatmap-item:last-child { border-bottom:none; }
+.heatmap-rank { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; }
+.heatmap-info { flex:1; min-width:0; }
+.heatmap-name { font-size:14px; font-weight:500; }
+.heatmap-meta { font-size:12px; color:#718096; }
+.heatmap-bar { flex:1; height:24px; background:#edf2f7; border-radius:4px; overflow:hidden; }
+.heatmap-fill { height:100%; border-radius:4px; display:flex; align-items:center; justify-content:flex-end; padding-right:8px; font-size:12px; font-weight:600; color:#fff; }
+
+/* 饼图卡片 */
+.pie-card { text-align:center; padding:16px; }
+.pie-chart { width:80px; height:80px; border-radius:50%; margin:0 auto 12px; position:relative; display:flex; align-items:center; justify-content:center; }
+.pie-chart::after { content:''; width:50px; height:50px; background:#fff; border-radius:50%; position:absolute; }
+.pie-value { position:relative; z-index:1; font-size:16px; font-weight:700; }
+.pie-label { font-size:13px; font-weight:500; margin-bottom:4px; }
+.pie-meta { font-size:12px; color:#718096; }
+
+/* 迷你进度 */
+.mini-stages { display:flex; gap:2px; margin:8px 0; }
+.mini-stage { flex:1; height:4px; border-radius:2px; background:#edf2f7; }
+.mini-stage.filled { background:#667eea; }
+
+/* 圆环SVG */
+.gauge-container { text-align:center; }
+.gauge-container svg { transform:rotate(-90deg); }
+.gauge-label { font-size:14px; color:#718096; margin-top:8px; }
+.gauge-value { font-size:32px; font-weight:700; color:#1a365d; margin-top:4px; }
+
+/* 触点评分条 */
+.touchpoint-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f0f0f5; }
+.touchpoint-row:last-child { border-bottom:none; }
+.touchpoint-name { width:90px; font-size:13px; font-weight:500; }
+.touchpoint-bar-wrap { flex:1; height:24px; background:#edf2f7; border-radius:4px; overflow:hidden; }
+.touchpoint-bar { height:100%; border-radius:4px; display:flex; align-items:center; justify-content:flex-end; padding-right:8px; font-size:12px; font-weight:600; color:#fff; }
+.touchpoint-stats { font-size:12px; color:#718096; width:100px; text-align:right; }
+
+/* 阶段筛选 */
+.stage-filter { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+.stage-btn { padding:6px 14px; border-radius:20px; border:1px solid #e2e8f0; background:#fff; cursor:pointer; font-size:13px; transition:all 0.2s; }
+.stage-btn:hover { border-color:#a0aec0; }
+.stage-btn.active { background:#1a365d; color:#fff; border-color:#1a365d; }
+
+/* 模型卡片 */
+.model-card { background:#fff; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.06); padding:20px; }
+.model-card .model-icon { font-size:32px; margin-bottom:12px; }
+.model-card .model-name { font-size:15px; font-weight:600; margin-bottom:8px; }
+.model-meta { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.model-meta-item { font-size:12px; }
+.model-meta-item .meta-label { color:#718096; }
+.model-meta-item .meta-value { font-weight:600; }
+
+/* 飞轮 */
+.flywheel { height:12px; background:#edf2f7; border-radius:6px; overflow:hidden; margin:12px 0; }
+.flywheel-fill { height:100%; border-radius:6px; background:linear-gradient(90deg, #667eea, #ed8936); display:flex; align-items:center; justify-content:flex-end; padding-right:8px; font-size:10px; font-weight:600; color:#fff; }
+
+/* 设置 */
+.setting-group { margin-bottom:24px; }
+.setting-group h3 { font-size:14px; font-weight:600; margin-bottom:12px; color:#1a365d; }
+.setting-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #f0f0f5; }
+.setting-row:last-child { border-bottom:none; }
+.setting-label { font-size:14px; }
+.setting-desc { font-size:12px; color:#718096; }
+.toggle { width:44px; height:24px; border-radius:12px; background:#cbd5e0; cursor:pointer; position:relative; transition:background 0.2s; }
+.toggle.on { background:#38a169; }
+.toggle::after { content:''; width:20px; height:20px; border-radius:50%; background:#fff; position:absolute; top:2px; left:2px; transition:left 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+.toggle.on::after { left:22px; }
+
+/* 项目卡片 */
+.project-card { background:#fff; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.06); padding:20px; margin-bottom:16px; }
+.project-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.project-icon { font-size:28px; }
+.project-name { font-size:16px; font-weight:600; }
+.project-loc { font-size:13px; color:#718096; }
+.project-metrics { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin:12px 0; padding:12px 0; border-top:1px solid #f0f0f5; border-bottom:1px solid #f0f0f5; }
+.project-metric .metric-value { font-size:16px; font-weight:600; }
+.project-metric .metric-label { font-size:11px; color:#718096; }
+.project-actions { display:flex; gap:8px; margin-top:12px; }
+
+/* 分红计算器 */
+.calc-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.calc-input-group { margin-bottom:12px; }
+.calc-input-group label { display:block; font-size:13px; font-weight:500; margin-bottom:4px; color:#4a5568; }
+.calc-input { width:100%; padding:8px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:14px; }
+.calc-result { background:#f7fafc; padding:16px; border-radius:8px; margin-top:12px; }
+.calc-result .result-item { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #e2e8f0; }
+.calc-result .result-item:last-child { border-bottom:none; font-weight:700; color:#ed8936; }
+
+/* 工程卡片 */
+.eng-card { background:#fff; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.06); padding:20px; margin-bottom:16px; }
+.eng-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.eng-name { font-size:15px; font-weight:600; }
+.eng-progress-text { font-size:14px; font-weight:600; color:#1a365d; }
+.eng-meta { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:12px 0; font-size:13px; }
+.eng-meta .meta-item { text-align:center; }
+.eng-meta .meta-value { font-size:16px; font-weight:600; }
+.eng-meta .meta-label { font-size:11px; color:#718096; }
+.eng-next { background:#fffaf0; padding:8px 12px; border-radius:6px; font-size:12px; color:#c05621; margin-top:12px; }
+
+/* 团队成员 */
+.member-list { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.member-card { display:flex; align-items:center; gap:12px; padding:12px; background:#fff; border-radius:8px; border:1px solid #f0f0f5; }
+.member-avatar { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:600; color:#fff; }
+.member-info { flex:1; }
+.member-name { font-size:14px; font-weight:500; }
+.member-role { font-size:12px; color:#718096; }
+.member-status { width:8px; height:8px; border-radius:50%; }
+.member-status.online { background:#38a169; }
+.member-status.offline { background:#a0aec0; }
+
+/* 权限表 */
+.perm-table td:first-child { font-weight:500; }
+.perm-check { width:16px; height:16px; border-radius:4px; background:#38a169; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-size:10px; }
+.perm-dash { color:#a0aec0; }
+
+/* 评价列表 */
+.eval-item { padding:12px 0; border-bottom:1px solid #f0f0f5; }
+.eval-item:last-child { border-bottom:none; }
+.eval-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+.eval-user { font-size:14px; font-weight:500; }
+.eval-score { font-size:14px; font-weight:600; color:#ed8936; }
+.eval-text { font-size:13px; color:#4a5568; margin:4px 0; }
+.eval-meta { font-size:11px; color:#a0aec0; }
+
+/* 趋势指标 */
+.trend-indicator { padding:12px 16px; background:#f7fafc; border-radius:8px; display:flex; justify-content:space-between; align-items:center; }
+.trend-label { font-size:13px; color:#4a5568; }
+.trend-value { font-size:16px; font-weight:600; }
+.trend-delta { font-size:12px; }
+.trend-delta.up { color:#38a169; }
+.trend-delta.down { color:#e53e3e; }
+.trend-delta.stable { color:#718096; }
+
+/* 概念卡片 */
+.concept-card { background:#fff; border:1px solid #f0f0f5; border-radius:10px; padding:16px; }
+.concept-card .concept-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.concept-card .concept-icon { font-size:24px; }
+.concept-card .concept-name { font-size:14px; font-weight:600; }
+.concept-card .concept-desc { font-size:12px; color:#718096; line-height:1.6; }
+.concept-card .concept-stats { display:flex; gap:16px; margin-top:8px; font-size:12px; }
+
+/* 阶段标签色 */
+.stage-tag-1 { background:#ebf4ff; color:#2b6cb0; }
+.stage-tag-2 { background:#faf5ff; color:#6b46c1; }
+.stage-tag-3 { background:#fff5f7; color:#b83280; }
+.stage-tag-4 { background:#e6fffa; color:#285e61; }
+.stage-tag-5 { background:#f0fff4; color:#276749; }
+.stage-tag-6 { background:#fffaf0; color:#c05621; }
+.stage-tag-7 { background:#ebf8ff; color:#2c7a7b; }
+
+.severity-yellow { color:#d69e2e; }
+.severity-green { color:#38a169; }
+.severity-red { color:#e53e3e; }
+
+/* ====== 手机端响应式 ====== */
+@media (max-width: 768px) {
+  body { flex-direction:column; }
+
+  /* 汉堡菜单 */
+  .hamburger { display:flex; }
+  .sidebar-overlay { display:block; }
+
+  /* 侧边栏 — 抽屉式 */
+  .sidebar {
+    position:fixed; left:-280px; top:0; bottom:0; width:280px; min-width:280px;
+    z-index:150; transition:left 0.3s ease;
+  }
+  .sidebar.open { left:0; }
+  .sidebar-overlay { display:none; }
+  .sidebar-overlay.show { display:block; }
+
+  /* 主内容区全宽 */
+  .main { margin-left:0 !important; width:100%; }
+  .header { padding:12px 16px 12px 56px; flex-wrap:wrap; gap:8px; }
+  .header h2 { font-size:16px; }
+  .header-right { font-size:12px; gap:10px; }
+  .content { padding:12px; }
+
+  /* 统计卡片 — 2列 */
+  .stat-grid { grid-template-columns:repeat(2,1fr); gap:8px; }
+  .stat-card { padding:12px; gap:10px; }
+  .stat-icon { width:36px; height:36px; font-size:18px; border-radius:8px; }
+  .stat-value { font-size:18px; }
+  .stat-label { font-size:11px; }
+
+  /* 所有多列布局降为1-2列 */
+  .grid-2, .grid-3, .grid-4 { grid-template-columns:1fr; gap:12px; }
+  .project-metrics { grid-template-columns:repeat(3,1fr); gap:8px; }
+  .eng-meta { grid-template-columns:repeat(2,1fr); gap:8px; }
+  .member-list { grid-template-columns:1fr 1fr; }
+  .calc-grid { grid-template-columns:1fr; }
+  .model-meta { grid-template-columns:1fr 1fr; }
+
+  /* 卡片 */
+  .card { padding:14px; margin-bottom:12px; border-radius:10px; }
+  .card-title { font-size:14px; margin-bottom:10px; }
+  .card-header h3 { font-size:14px; }
+
+  /* 表格 — 横滚 */
+  .data-table, table { display:block; overflow-x:auto; white-space:nowrap; -webkit-overflow-scrolling:touch; }
+  th, td { padding:8px 10px; font-size:11px; }
+
+  /* 协同办公子tab */
+  .subtab-bar { flex-wrap:wrap; gap:4px; padding:6px; }
+  .collab-tab { padding:6px 12px; font-size:11px; }
+  .subtabs { overflow-x:auto; flex-wrap:nowrap; gap:4px; }
+  .subtab { padding:6px 10px; font-size:12px; white-space:nowrap; }
+
+  /* 阶段筛选 */
+  .stage-filter { gap:4px; }
+  .stage-btn { padding:4px 10px; font-size:11px; }
+
+  /* 进度条 */
+  .bar-chart { height:120px; gap:4px; }
+
+  /* 弹窗 */
+  .modal-box { width:95%; max-width:95%; margin:20px auto; padding:16px; max-height:85vh; }
+  .modal-header h3 { font-size:15px; }
+  .modal-body { max-height:55vh; }
+
+  /* 设置行 */
+  .setting-row { flex-direction:column; align-items:flex-start; gap:8px; }
+
+  /* 按钮 */
+  .btn { padding:6px 12px; font-size:12px; }
+  .btn-sm { padding:3px 8px; font-size:10px; }
+
+  /* 项目卡片 */
+  .project-card { padding:14px; }
+  .project-header { flex-wrap:wrap; }
+  .project-actions { flex-wrap:wrap; }
+
+  /* 飞轮 */
+  .flywheel-fill { font-size:9px; }
+
+  /* 柱状图 */
+  .bar { border-radius:4px 4px 0 0; }
+
+  /* 语音按钮位置调整 */
+  #voiceBtn { right:12px; bottom:80px; width:44px; height:44px; font-size:18px; }
+  #voiceMute { right:12px; bottom:132px; width:32px; height:32px; font-size:14px; }
+
+  /* 触点评分 */
+  .touchpoint-row { flex-wrap:wrap; }
+  .touchpoint-name { width:100%; }
+  .touchpoint-stats { width:100%; text-align:left; }
+}
+</style>
+</head>
+<body>
+
+<!-- 手机端汉堡菜单 -->
+<button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- 侧边栏 -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <h1>房找人</h1>
+    <p>GP 管理后台</p>
+  </div>
+  <nav class="sidebar-nav" id="sidebarNav">
+    <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span> 仪表盘</div>
+    <div class="nav-item" data-page="demand"><span class="nav-icon">🔍</span> 需求洞察</div>
+    <div class="nav-item" data-page="projects"><span class="nav-icon">🏗️</span> 项目管理</div>
+    <div class="nav-item" data-page="evaluation"><span class="nav-icon">⭐</span> 客户评价</div>
+    <div class="nav-item" data-page="lp"><span class="nav-icon">👥</span> LP管理</div>
+    <div class="nav-item" data-page="collab"><span class="nav-icon">🖥️</span> 协同办公</div>
+    <div class="nav-item" data-page="design"><span class="nav-icon">📐</span> 设计与工程</div>
+    <div class="nav-item" data-page="ai"><span class="nav-icon">🤖</span> AI引擎</div>
+    <div class="nav-item" data-page="members"><span class="nav-icon">👥</span> 会员数据</div>
+    <div class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span> 设置</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="avatar">周</div>
+      <div>
+        <div style="font-weight:500;">周志远</div>
+        <div style="color:rgba(255,255,255,0.5);">GP管理员</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- 主内容 -->
+<div class="main">
+  <header class="header">
+    <h2 id="pageTitle">仪表盘</h2>
+    <div class="header-right">
+      <div class="notify">🔔<span class="badge">3</span></div>
+      <span>2026-07-17 周五</span>
+    </div>
+  </header>
+  <div class="content" id="contentArea">
+  </div>
+</div>
+
+<script>
+const stages = [
+  { id: 1, name: '需求发现', icon: '🔍', color: '#667eea' },
+  { id: 2, name: '精准获地', icon: '📍', color: '#764ba2' },
+  { id: 3, name: '共创设计', icon: '🎨', color: '#f093fb' },
+  { id: 4, name: '透明建造', icon: '🏗️', color: '#4facfe' },
+  { id: 5, name: '个性化交付', icon: '🔑', color: '#43e97b' },
+  { id: 6, name: '评价验收', icon: '⭐', color: '#fa709a' },
+  { id: 7, name: '持续运营', icon: '🔄', color: '#8ee4af' },
+];
+const dashboardStats = { totalProjects:3, activeProjects:3, totalLP:259, totalCapital:2570000000, avgCSI:4.5, avgNPS:45 };
+const projects = [
+  { id:'p1', name:'翡翠湾花园', location:'未来科技城', icon:'🏘️', stage:4, units:286, reserved:213, lpCount:187, csi:4.7, totalInvestment:850000000, unitPrice:32000, areaRange:'98-168㎡' },
+  { id:'p2', name:'云栖山居', location:'之江板块', icon:'🏔️', stage:2, units:156, reserved:89, lpCount:72, csi:4.3, totalInvestment:520000000, unitPrice:45000, areaRange:'120-220㎡' },
+  { id:'p3', name:'星耀城', location:'钱江世纪城', icon:'🌆', stage:1, units:420, reserved:56, lpCount:0, csi:null, totalInvestment:1200000000, unitPrice:28000, areaRange:'85-135㎡' },
+];
+const riskAlerts = [
+  { project:'翡翠湾花园', type:'进度风险', level:'yellow', content:'主体结构施工略有滞后，预计延误3-5天', date:'2026-07-15' },
+  { project:'云栖山居', type:'LP募集', level:'green', content:'LP募集进度85%，超出预期', date:'2026-07-14' },
+  { project:'星耀城', type:'市场风险', level:'yellow', content:'周边竞品降价促销，需关注定价策略', date:'2026-07-13' },
+];
+const csiHistory = [
+  { month:'1月', csi:4.2, nps:35 }, { month:'2月', csi:4.3, nps:38 }, { month:'3月', csi:4.1, nps:32 },
+  { month:'4月', csi:4.4, nps:42 }, { month:'5月', csi:4.5, nps:45 }, { month:'6月', csi:4.6, nps:48 }, { month:'7月', csi:4.7, nps:52 },
+];
+const demandHeatmap = [
+  { region:'未来科技城', score:92, demand:'刚需+改善', price:'300-500万' },
+  { region:'钱江世纪城', score:88, demand:'刚需', price:'250-400万' },
+  { region:'之江', score:85, demand:'改善+高端', price:'500-1000万' },
+  { region:'钱江新城二期', score:83, demand:'高端改善', price:'600-1500万' },
+  { region:'滨江', score:82, demand:'改善', price:'400-700万' },
+  { region:'城东新城', score:78, demand:'刚需+改善', price:'300-500万' },
+  { region:'申花', score:75, demand:'改善+高端', price:'600-1200万' },
+  { region:'良渚', score:72, demand:'刚需+养老', price:'200-350万' },
+];
+const customerSegments = [
+  { name:'年轻刚需', pct:35, age:29, budget:'280万', demand:'地铁+小户型', color:'#667eea' },
+  { name:'改善家庭', pct:30, age:38, budget:'520万', demand:'学区+大户型', color:'#f093fb' },
+  { name:'品质升级', pct:20, age:45, budget:'850万', demand:'低密+景观', color:'#4facfe' },
+  { name:'投资养老', pct:15, age:55, budget:'350万', demand:'环境+医疗', color:'#43e97b' },
+];
+const touchpoints = [
+  { name:'需求表达', score:4.6, count:1245, trend:'up' },
+  { name:'产品概念', score:4.4, count:892, trend:'up' },
+  { name:'设计参与', score:4.7, count:756, trend:'stable' },
+  { name:'建造透明', score:4.3, count:634, trend:'up' },
+  { name:'交付体验', score:4.5, count:412, trend:'stable' },
+  { name:'综合评价', score:4.5, count:523, trend:'up' },
+  { name:'居住体验', score:4.2, count:287, trend:'down' },
+];
+const tickets = [
+  { id:'tk1', project:'翡翠湾花园', issue:'建造直播细节不够丰富', source:'客户评价', severity:'yellow', status:'处理中', assignee:'工程部-李明', due:'2026-05-19' },
+  { id:'tk2', project:'云栖山居', issue:'需求匹配度反馈一般', source:'需求发现评价', severity:'yellow', status:'已完成', assignee:'产品部-王芳', due:'2026-04-22' },
+  { id:'tk3', project:'翡翠湾花园', issue:'设计模块选择不够灵活', source:'共创设计评价', severity:'green', status:'已完成', assignee:'设计部-陈工', due:'2026-02-14' },
+  { id:'tk4', project:'星耀城', issue:'需求采集渠道单一', source:'AI分析', severity:'yellow', status:'待处理', assignee:'运营部-赵敏', due:'2026-07-17' },
+];
+const lpList = [
+  { name:'张明远', level:'VIP', invest:'150万', projects:2, date:'2025-10-01', status:'active' },
+  { name:'李建国', level:'普通', invest:'50万', projects:1, date:'2025-11-15', status:'active' },
+  { name:'王思雨', level:'VIP', invest:'200万', projects:2, date:'2025-09-20', status:'active' },
+  { name:'陈伟', level:'普通', invest:'80万', projects:1, date:'2026-01-10', status:'active' },
+  { name:'赵敏', level:'潜在', invest:'0', projects:0, date:'2026-07-01', status:'pending' },
+];
+const designLib = [
+  { name:'现代简约-A', type:'装修风格', usage:45, rating:4.6, icon:'🎨' },
+  { name:'新中式-B', type:'装修风格', usage:32, rating:4.4, icon:'🏯' },
+  { name:'北欧风-C', type:'装修风格', usage:28, rating:4.3, icon:'🌿' },
+  { name:'三房两厅两卫', type:'户型模块', usage:67, rating:4.7, icon:'🏠' },
+  { name:'全屋智能旗舰', type:'智能家居', usage:38, rating:4.8, icon:'🤖' },
+  { name:'定制收纳方案', type:'收纳方案', usage:52, rating:4.5, icon:'📦' },
+];
+const engineering = [
+  { project:'翡翠湾花园', progress:62, quality:4.6, safetyDays:287, workers:156, next:'内部装修进场' },
+  { project:'云栖山居', progress:28, quality:4.4, safetyDays:89, workers:72, next:'基础施工完成' },
+  { project:'星耀城', progress:8, quality:null, safetyDays:17, workers:34, next:'方案设计评审' },
+];
+const aiModels = [
+  { name:'需求预测引擎', icon:'🔮', accuracy:'87.3%', samples:'12,580', version:'v2.4.1', trained:'2026-07-15' },
+  { name:'产品推荐引擎', icon:'🎯', accuracy:'84.6%', samples:'8,920', version:'v1.9.3', trained:'2026-07-14' },
+  { name:'质量评估引擎', icon:'🛡️', accuracy:'91.2%', samples:'4,560', version:'v3.1.0', trained:'2026-07-13' },
+  { name:'服务匹配引擎', icon:'🤝', accuracy:'79.8%', samples:'6,780', version:'v1.5.2', trained:'2026-07-12' },
+];
+const evaluations = [
+  { user:'张先生', project:'翡翠湾花园', stage:'需求发现', score:4.5, text:'需求采集很细致', date:'2025-10-15', sentiment:'positive' },
+  { user:'李女士', project:'翡翠湾花园', stage:'共创设计', score:4.8, text:'参与设计的感觉太棒了！', date:'2026-01-20', sentiment:'positive' },
+  { user:'王先生', project:'翡翠湾花园', stage:'透明建造', score:4.3, text:'希望能增加更多细节', date:'2026-05-10', sentiment:'neutral' },
+  { user:'赵女士', project:'云栖山居', stage:'需求发现', score:4.2, text:'需求匹配度还有提升空间', date:'2026-04-10', sentiment:'neutral' },
+];
+
+const pageTitles = {
+  dashboard:'仪表盘', demand:'需求洞察', projects:'项目管理',
+  evaluation:'客户评价', lp:'LP管理', collab:'协同办公', design:'设计与工程',
+  ai:'AI引擎', members:'会员数据', settings:'设置'
+};
+
+// 导航切换
+document.getElementById('sidebarNav').addEventListener('click', function(e) {
+  const item = e.target.closest('.nav-item');
+  if (!item) return;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  item.classList.add('active');
+  const page = item.dataset.page;
+  document.getElementById('pageTitle').textContent = pageTitles[page];
+  renderPage(page);
+  // 手机端：点击菜单项后自动关闭侧边栏
+  if (window.innerWidth <= 768) closeSidebar();
+});
+
+// 侧边栏开关（手机端）
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const isOpen = sidebar.classList.contains('open');
+  if (isOpen) { closeSidebar(); }
+  else { sidebar.classList.add('open'); overlay.classList.add('show'); }
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+function fmt(n) { return n ? n.toLocaleString() : '-'; }
+function fmtMoney(n) { return n ? (n/100000000).toFixed(1)+'亿' : '-'; }
+
+function renderPage(page) {
+  const c = document.getElementById('contentArea');
+  switch(page) {
+    case 'dashboard': c.innerHTML = renderDashboard(); break;
+    case 'demand': c.innerHTML = renderDemand(); break;
+    case 'projects': c.innerHTML = renderProjects(); break;
+    case 'evaluation': c.innerHTML = renderEvaluation(); break;
+    case 'lp': c.innerHTML = renderLP(); break;
+    case 'collab': c.innerHTML = renderCollab(); break;
+    case 'design': c.innerHTML = renderDesign(); break;
+    case 'ai': c.innerHTML = renderAI(); break;
+    case 'members': c.innerHTML = renderMembers(); break;
+    case 'settings': c.innerHTML = renderSettings(); break;
+  }
+  initPageScripts(page);
+}
+
+function initPageScripts(page) {
+  if (page === 'evaluation') {
+    document.querySelectorAll('.subtab').forEach(t => {
+      t.addEventListener('click', function() {
+        document.querySelectorAll('.subtab').forEach(s => s.classList.remove('active'));
+        this.classList.add('active');
+        document.querySelectorAll('.subtab-content').forEach(s => s.classList.remove('active'));
+        document.getElementById(this.dataset.tab).classList.add('active');
+      });
+    });
+  }
+  if (page === 'collab') {
+    // 子tab切换
+    document.querySelectorAll('.collab-tab').forEach(t => {
+      t.addEventListener('click', function() {
+        document.querySelectorAll('.collab-tab').forEach(s => s.classList.remove('active'));
+        this.classList.add('active');
+        document.querySelectorAll('.collab-content').forEach(s => s.classList.remove('active'));
+        document.getElementById('collab-'+this.dataset.tab).classList.add('active');
+      });
+    });
+    // 所有按钮事件委托
+    document.getElementById('contentArea').addEventListener('click', function(e) {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const act = btn.dataset.action;
+      if (!act) return;
+      e.preventDefault();
+      handleCollabAction(act, btn);
+    });
+  }
+  if (page === 'projects') {
+    document.querySelectorAll('.stage-btn').forEach(b => {
+      b.addEventListener('click', function() {
+        document.querySelectorAll('.stage-btn').forEach(s => s.classList.remove('active'));
+        this.classList.add('active');
+        const sid = this.dataset.stage;
+        document.querySelectorAll('.project-card').forEach(card => {
+          if (sid === 'all') { card.style.display = 'block'; }
+          else { card.style.display = card.dataset.stage === sid ? 'block' : 'none'; }
+        });
+      });
+    });
+  }
+}
+
+// ====== 全局弹窗系统 ======
+function showModal(title, content, footer) {
+  let modal = document.getElementById('globalModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'globalModal';
+    modal.innerHTML = `
+      <div class="modal-overlay" onclick="this.parentElement.style.display='none'"></div>
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 id="modalTitle"></h3>
+          <button class="modal-close" onclick="document.getElementById('globalModal').style.display='none'">✕</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer" id="modalFooter"></div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    // 添加弹窗样式
+    if (!document.getElementById('modalStyles')) {
+      const s = document.createElement('style');
+      s.id = 'modalStyles';
+      s.textContent = `
+        #globalModal { display:none; position:fixed; top:0;left:0;right:0;bottom:0;z-index:9999; }
+        #globalModal.show { display:flex; align-items:center; justify-content:center; }
+        .modal-overlay { position:absolute; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.5); }
+        .modal-box { position:relative; background:#fff; border-radius:16px; width:600px; max-width:90vw; max-height:80vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.2); }
+        .modal-header { display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid #e2e8f0; }
+        .modal-header h3 { font-size:18px; font-weight:700; color:#1a202c; }
+        .modal-close { background:none; border:none; font-size:20px; color:#a0aec0; cursor:pointer; padding:4px 8px; border-radius:6px; }
+        .modal-close:hover { background:#f7fafc; color:#4a5568; }
+        .modal-body { padding:24px; }
+        .modal-footer { padding:16px 24px; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:8px; }
+        .modal-footer button { padding:8px 20px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; border:none; }
+        .btn-cancel { background:#edf2f7; color:#4a5568; }
+        .btn-cancel:hover { background:#e2e8f0; }
+        .btn-confirm { background:#1a365d; color:#fff; }
+        .btn-confirm:hover { background:#2d5a8e; }
+        .detail-row { display:flex; padding:10px 0; border-bottom:1px solid #f7fafc; }
+        .detail-label { width:100px; font-size:13px; color:#718096; flex-shrink:0; }
+        .detail-value { font-size:14px; color:#1a202c; font-weight:500; }
+        .form-group { margin-bottom:16px; }
+        .form-group label { display:block; font-size:13px; font-weight:600; color:#4a5568; margin-bottom:6px; }
+        .form-group input, .form-group select, .form-group textarea { width:100%; padding:10px 14px; border:1px solid #e2e8f0; border-radius:8px; font-size:14px; color:#1a202c; outline:none; font-family:inherit; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:#1a365d; box-shadow:0 0 0 3px rgba(26,54,93,0.1); }
+        .form-group textarea { min-height:80px; resize:vertical; }
+        .toast { position:fixed; top:20px; right:20px; background:#1a365d; color:#fff; padding:14px 24px; border-radius:10px; font-size:14px; font-weight:600; z-index:99999; box-shadow:0 8px 24px rgba(0,0,0,0.2); animation:slideIn 0.3s ease; }
+        @keyframes slideIn { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
+      `;
+      document.head.appendChild(s);
+    }
+  }
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = content;
+  document.getElementById('modalFooter').innerHTML = footer || '<button class="btn-confirm" onclick="document.getElementById(\'globalModal\').style.display=\'none\'">关闭</button>';
+  modal.classList.add('show');
+  modal.style.display = 'flex';
+}
+
+function showToast(msg, type) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.style.background = type === 'success' ? '#38a169' : type === 'error' ? '#e53e3e' : '#1a365d';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 2000);
+}
+
+// ====== 协同办公交互处理 ======
+function handleCollabAction(action, btn) {
+  switch(action) {
+    // 招投标
+    case 'bidding-detail': {
+      const id = btn.dataset.id;
+      const b = biddingData.find(x => x.id === id);
+      if (!b) return;
+      showModal('招标详情 - ' + b.id,
+        `<div class="detail-row"><span class="detail-label">招标编号</span><span class="detail-value">${b.id}</span></div>
+         <div class="detail-row"><span class="detail-label">项目名称</span><span class="detail-value">${b.name}</span></div>
+         <div class="detail-row"><span class="detail-label">招标类型</span><span class="detail-value">${b.type}</span></div>
+         <div class="detail-row"><span class="detail-label">预算金额</span><span class="detail-value">${b.budget}</span></div>
+         <div class="detail-row"><span class="detail-label">当前状态</span><span class="detail-value">${b.status}</span></div>
+         <div class="detail-row"><span class="detail-label">当前阶段</span><span class="detail-value">${b.stage}</span></div>
+         <div class="detail-row"><span class="detail-label">投标单位数</span><span class="detail-value">${b.bidders}家</span></div>
+         <div class="detail-row"><span class="detail-label">截止日期</span><span class="detail-value">${b.deadline}</span></div>
+         ${b.winner ? `<div class="detail-row"><span class="detail-label">中标单位</span><span class="detail-value" style="color:#38a169;font-weight:700;">${b.winner}</span></div>` : ''}`,
+        `<button class="btn-cancel" onclick="document.getElementById('globalModal').style.display='none'">关闭</button>
+         <button class="btn-confirm" onclick="showToast('已进入评标工作台','success');document.getElementById('globalModal').style.display='none'">进入工作台</button>`
+      );
+      break;
+    }
+    case 'bidding-new': {
+      showModal('新建招标',
+        `<div class="form-group"><label>项目名称</label><input id="fBidName" placeholder="请输入招标项目名称"></div>
+         <div class="form-group"><label>招标类型</label><select id="fBidType"><option>施工总承包</option><option>专业分包</option><option>材料采购</option><option>咨询服务</option></select></div>
+         <div class="form-group"><label>预算金额</label><input id="fBidBudget" placeholder="例如：5000万"></div>
+         <div class="form-group"><label>截止日期</label><input id="fBidDeadline" type="date"></div>`,
+        `<button class="btn-cancel" onclick="document.getElementById('globalModal').style.display='none'">取消</button>
+         <button class="btn-confirm" onclick="
+           const n=document.getElementById('fBidName').value;
+           if(!n){alert('请输入项目名称');return;}
+           showToast('招标项目「'+n+'」创建成功！','success');
+           document.getElementById('globalModal').style.display='none';
+         ">确认创建</button>`
+      );
+      break;
+    }
+    case 'bidder-detail': {
+      const name = btn.dataset.name;
+      const b = bidders.find(x => x.name === name);
+      if (!b) return;
+      showModal('供应商详情 - ' + b.name,
+        `<div class="detail-row"><span class="detail-label">供应商名称</span><span class="detail-value" style="font-weight:700;">${b.name}</span></div>
+         <div class="detail-row"><span class="detail-label">合作项目</span><span class="detail-value">${b.projects}个</span></div>
+         <div class="detail-row"><span class="detail-label">综合评分</span><span class="detail-value" style="color:${b.score>=4.5?'#38a169':'#ed8936'};font-weight:700;">★ ${b.score}/5.0</span></div>
+         <div class="detail-row"><span class="detail-label">资质状态</span><span class="detail-value">${b.status}</span></div>
+         <div class="detail-row"><span class="detail-label">联系人</span><span class="detail-value">${b.contact}</span></div>
+         <div class="detail-row"><span class="detail-label">历史项目</span><span class="detail-value">翡翠湾花园一期、云栖山居桩基</span></div>
+         <div class="detail-row"><span class="detail-label">注册资金</span><span class="detail-value">10亿元</span></div>`,
+        `<button class="btn-cancel" onclick="document.getElementById('globalModal').style.display='none'">关闭</button>
+         <button class="btn-confirm" onclick="showToast('已发送合作邀请给${b.name}','success');document.getElementById('globalModal').style.display='none'">发送合作邀请</button>`
+      );
+      break;
+    }
+    case 'bidder-new': {
+      showModal('新增供应商',
+        `<div class="form-group"><label>供应商名称</label><input id="fSupName" placeholder="请输入供应商名称"></div>
+         <div class="form-group"><label>资质等级</label><select id="fSupLevel"><option>特级</option><option>一级</option><option>二级</option></select></div>
+         <div class="form-group"><label>联系人</label><input id="fSupContact" placeholder="姓名 电话"></div>`,
+        `<button class="btn-cancel" onclick="document.getElementById('globalModal').style.display='none'">取消</button>
+         <button class="btn-confirm" onclick="
+           const n=document.getElementById('fSupName').value;
+           if(!n){alert('请输入供应商名称');return;}
+           showToast('供应商「'+n+'」已加入考察库','success');
+           document.getElementById('globalModal').style.display='none';
+         ">确认添加</button>`
+      );
+      break;
+    }
+    // 规划设计
+    case 'design-detail': {
+      const id = btn.dataset.id;
+      const d = designPlans.find(x => x.id === id);
+      if (!d) return;
+      showModal('方案详情 - ' + d.id,
+        `<div class="detail-row"><span class="detail-label">方案编号</span><span class="detail-value">${d.id}</span></div>
+         <div class="detail-row"><span class="detail-label">所属项目</span><span class="detail-value">${d.project}</span></div>
+         <div class="detail-row"><span class="detail-label">方案名称</span><span class="detail-value" style="font-weight:700;">${d.name}</span></div>
+         <div class="detail-row"><span class="detail-label">当前版本</span><span class="detail-value">${d.version}</span></div>
+         <div class="detail-row"><span class="detail-label">设计单位</span><span class="detail-value">${d.designer}</span></div>
+         <div class="detail-row"><span class="detail-label">审核状态</span><span class="detail-value">${d.status}</span></div>
+         <div class="detail-row"><span class="detail-label">审核人</span><span class="detail-value">${d.reviewer}</span></div>
+         <div class="detail-row"><span class="detail-label">日期</span><span class="detail-value">${d.date}</span></div>
+         <div style="margin-top:12px;padding:12px;background:#f7fafc;border-radius:8px;font-size:13px;color:#718096;">
+           📎 附件：${d.name}_${d.version}.pdf (12.5MB)<br>
+           📎 附件：${d.name}_审图意见.pdf (2.1MB)
+         </div>`,
+        `<button class="btn-cancel" onclick="document.getElementById('globalModal').style.display='none'">关闭</button>
+         ${d.status === '评审中' ? `<button class="btn-confirm" onclick="showToast('方案评审已通过！','success');document.getElementById('globalModal').style.display='none'">通过评审</button>` : ''}
+         <button class="btn-confirm" style="background:#ed8936;" onclick="showToast('已下载方案文件','success');document.getElementById('globalModal').style.display='none'">下载附件</button>`
+      );
+      break;
+    }
+    case 'design-new': {
+      showModal('新建设计方案',
+        `<div class="form-group"><label>所属项目</label><select id="fDsProject"><option>翡翠湾花园</option><option>云栖山居</option><option>星耀城</option></select></div>
+         <div class="form-group"><label>方案名称</label><input id="fDsName" placeholder="请输入方案名称"></div>
+         <div class="form-group"><label>设计单位</label><input id="fDsDesigner" placeholder="请输入设计单位"></div>
+         <div class="form-group"><label>备注</label><textarea id="fDsNote" placeholder="方案说明..."></textarea></div>`,
+        `<button class="btn-cancel" onclick="document.getElementById('globalModal').style.display='none'">取消</button>
+         <button class="btn-confirm" onclick="
+           const n=document.getElementById('fDsName').value;
+           if(!n){alert('请输入方案名称');return;}
+           showToast('方案「'+n+'」已创建，版本V1.0','success');
+           document.getElementById('globalModal').style.display='none';
+         ">创建方案</button>`
+      );
+      break;
+    }
+    // 工程管理
+    case 'bim-enter': {
+      showModal('🏗️ BIM协同平台',
+        `<div style="text-align:center;padding:20px;">
+          <div style="font-size:64px;margin-bottom:16px;">🏗️</div>
+          <h3 style="font-size:20px;font-weight:700;margin-bottom:8px;">正在启动BIM协同平台</h3>
+          <p style="color:#718096;margin-bottom:24px;">加载三维模型数据，请稍候...</p>
+          <div style="background:#f7fafc;border-radius:8px;padding:16px;text-align:left;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>建筑模型 (Architecture)</span><span style="color:#38a169;">✅ 已加载</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>结构模型 (Structure)</span><span style="color:#38a169;">✅ 已加载</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>机电模型 (MEP)</span><span style="color:#ed8936;">🔄 加载中...</span></div>
+            <div style="display:flex;justify-content:space-between;"><span>碰撞检查报告</span><span style="color:#718096;">⏳ 等待中</span></div>
+          </div>
+        </div>`,
+        `<button class="btn-cancel" onclick="document.getElementById('globalModal').style.display='none'">取消</button>
+         <button class="btn-confirm" onclick="showToast('BIM平台已启动，可在新窗口查看模型','success');document.getElementById('globalModal').style.display='none'">在新窗口打开</button>`
+      );
+      break;
+    }
+    // 客诉与维修
+    case 'complaint-new': {
+      showModal('新建客户投诉',
+        `<div class="form-group"><label>所属项目</label><select id="fCpProject"><option>翡翠湾花园</option><option>云栖山居</option><option>星耀城</option></select></div>
+         <div class="form-group"><label>客户姓名</label><input id="fCpCustomer" placeholder="请输入客户姓名"></div>
+         <div class="form-group"><label>投诉类型</label><select id="fCpType"><option>工程质量</option><option>设计问题</option><option>服务态度</option><option>进度咨询</option><option>其他</option></select></div>
+         <div class="form-group"><label>投诉内容</label><textarea id="fCpContent" placeholder="请详细描述投诉内容..."></textarea></div>
+         <div class="form-group"><label>严重程度</label><select id="fCpSeverity"><option>低</option><option>中</option><option>高</option></select></div>`,
+        `<button class="btn-cancel" onclick="document.getElementById('globalModal').style.display='none'">取消</button>
+         <button class="btn-confirm" onclick="
+           const c=document.getElementById('fCpCustomer').value;
+           if(!c){alert('请输入客户姓名');return;}
+           showToast('投诉工单已创建，已指派处理人','success');
+           document.getElementById('globalModal').style.display='none';
+         ">提交投诉</button>`
+      );
+      break;
+    }
+    case 'repair-new': {
+      showModal('新建维修工单',
+        `<div class="form-group"><label>所属项目</label><select id="fRpProject"><option>翡翠湾花园</option><option>云栖山居</option></select></div>
+         <div class="form-group"><label>房号</label><input id="fRpUnit" placeholder="例如：3-1501"></div>
+         <div class="form-group"><label>问题描述</label><textarea id="fRpIssue" placeholder="请描述需要维修的问题..."></textarea></div>
+         <div class="form-group"><label>维修类型</label><select id="fRpType"><option>土建</option><option>电气</option><option>给排水</option><option>门窗</option><option>暖通</option></select></div>
+         <div class="form-group"><label>紧急程度</label><select id="fRpUrgency"><option>一般</option><option>紧急</option></select></div>`,
+        `<button class="btn-cancel" onclick="document.getElementById('globalModal').style.display='none'">取消</button>
+         <button class="btn-confirm" onclick="
+           const u=document.getElementById('fRpUnit').value;
+           if(!u){alert('请输入房号');return;}
+           showToast('维修工单已派发，SLA计时开始','success');
+           document.getElementById('globalModal').style.display='none';
+         ">创建工单</button>`
+      );
+      break;
+    }
+    case 'complaint-detail': {
+      const id = btn.dataset.id;
+      const c = complaints.find(x => x.id === id);
+      if (!c) return;
+      showModal('投诉详情 - ' + c.id,
+        `<div class="detail-row"><span class="detail-label">投诉编号</span><span class="detail-value">${c.id}</span></div>
+         <div class="detail-row"><span class="detail-label">客户</span><span class="detail-value">${c.customer}</span></div>
+         <div class="detail-row"><span class="detail-label">类型</span><span class="detail-value">${c.type}</span></div>
+         <div class="detail-row"><span class="detail-label">内容</span><span class="detail-value">${c.content}</span></div>
+         <div class="detail-row"><span class="detail-label">严重度</span><span class="detail-value">${c.severity}</span></div>
+         <div class="detail-row"><span class="detail-label">状态</span><span class="detail-value">${c.status}</span></div>
+         <div class="detail-row"><span class="detail-label">处理人</span><span class="detail-value">${c.assignee}</span></div>
+         <div class="detail-row"><span class="detail-label">截止日期</span><span class="detail-value">${c.deadline}</span></div>`,
+        `<button class="btn-cancel" onclick="document.getElementById('globalModal').style.display='none'">关闭</button>
+         ${c.status === '处理中' ? `<button class="btn-confirm" onclick="showToast('投诉已标记为已解决','success');document.getElementById('globalModal').style.display='none'">标记已解决</button>` : ''}
+         <button class="btn-confirm" style="background:#ed8936;" onclick="showToast('已通知${c.assignee}加急处理','success');document.getElementById('globalModal').style.display='none'">催办</button>`
+      );
+      break;
+    }
+    case 'repair-detail': {
+      const id = btn.dataset.id;
+      const r = repairOrders.find(x => x.id === id);
+      if (!r) return;
+      showModal('维修工单 - ' + r.id,
+        `<div class="detail-row"><span class="detail-label">工单编号</span><span class="detail-value">${r.id}</span></div>
+         <div class="detail-row"><span class="detail-label">房号</span><span class="detail-value">${r.unit}</span></div>
+         <div class="detail-row"><span class="detail-label">问题描述</span><span class="detail-value">${r.issue}</span></div>
+         <div class="detail-row"><span class="detail-label">维修类型</span><span class="detail-value">${r.type}</span></div>
+         <div class="detail-row"><span class="detail-label">紧急度</span><span class="detail-value">${r.urgency}</span></div>
+         <div class="detail-row"><span class="detail-label">状态</span><span class="detail-value">${r.status}</span></div>
+         <div class="detail-row"><span class="detail-label">SLA时限</span><span class="detail-value">${r.sla}</span></div>
+         ${r.worker ? `<div class="detail-row"><span class="detail-label">维修工人</span><span class="detail-value">${r.worker}</span></div>` : ''}
+         ${r.doneDate ? `<div class="detail-row"><span class="detail-label">完成日期</span><span class="detail-value" style="color:#38a169;">${r.doneDate}</span></div>` : ''}`,
+        `<button class="btn-cancel" onclick="document.getElementById('globalModal').style.display='none'">关闭</button>
+         ${r.status === '待派单' ? `<button class="btn-confirm" onclick="showToast('工单已派发给维修班组','success');document.getElementById('globalModal').style.display='none'">派单</button>` : ''}
+         ${r.status === '维修中' ? `<button class="btn-confirm" onclick="showToast('维修完成，待客户确认','success');document.getElementById('globalModal').style.display='none'">标记完成</button>` : ''}`
+      );
+      break;
+    }
+    // 通用
+    case 'approve-change': {
+      const id = btn.dataset.id;
+      showToast('变更申请 ' + id + ' 已审批通过', 'success');
+      break;
+    }
+    case 'reject-change': {
+      const id = btn.dataset.id;
+      showToast('变更申请 ' + id + ' 已驳回', 'error');
+      break;
+    }
+    default:
+      showToast('功能开发中，敬请期待', '');
+  }
+}
+
+// ====== 协同办公数据 ======
+const biddingData = [
+  { id:'ZB2026-001', name:'翡翠湾花园二期总包工程', type:'施工总承包', budget:'2.8亿', status:'评标中', deadline:'2026-08-15', bidders:8, stage:'技术标评审' },
+  { id:'ZB2026-002', name:'云栖山居精装修工程', type:'专业分包', budget:'5200万', status:'招标中', deadline:'2026-08-20', bidders:12, stage:'资格预审' },
+  { id:'ZB2026-003', name:'星耀城桩基工程', type:'专业分包', budget:'3800万', status:'已定标', deadline:'2026-07-10', bidders:5, stage:'合同签订中', winner:'中建三局' },
+  { id:'ZB2026-004', name:'翡翠湾花园智能化工程', type:'专业分包', budget:'1600万', status:'招标中', deadline:'2026-08-25', bidders:0, stage:'编制招标文件' },
+];
+const bidders = [
+  { name:'中建三局', projects:3, score:4.6, status:'合格', contact:'王经理 138****6789' },
+  { name:'浙江建工', projects:2, score:4.4, status:'合格', contact:'李经理 139****8901' },
+  { name:'上海建工', projects:1, score:4.2, status:'考察中', contact:'陈经理 137****2345' },
+  { name:'中天建设', projects:4, score:4.8, status:'合格', contact:'赵经理 136****4567' },
+  { name:'绿城装饰', projects:2, score:4.5, status:'合格', contact:'周经理 135****7890' },
+];
+
+const designPlans = [
+  { id:'DS001', project:'翡翠湾花园', name:'外立面方案', version:'V3.2', status:'已确认', designer:'华东设计院', date:'2026-02-28', reviewer:'张管理' },
+  { id:'DS002', project:'云栖山居', name:'景观方案', version:'V2.1', status:'评审中', designer:'绿城设计', date:'2026-06-15', reviewer:'待评审' },
+  { id:'DS003', project:'星耀城', name:'总体规划方案', version:'V1.0', status:'编制中', designer:'浙大设计院', date:'2026-07-10', reviewer:'-' },
+  { id:'DS004', project:'翡翠湾花园', name:'地库优化方案', version:'V2.0', status:'已确认', designer:'华东设计院', date:'2026-03-10', reviewer:'张管理' },
+];
+const drawingChanges = [
+  { id:'CHG001', project:'翡翠湾花园', drawing:'结构施工图-15F', change:'梁柱节点优化', reason:'设计优化', from:'华东设计院', date:'2026-05-20', status:'已实施' },
+  { id:'CHG002', project:'云栖山居', drawing:'地下室防水', change:'防水材料变更', reason:'成本优化', from:'绿城设计', date:'2026-06-28', status:'审批中' },
+  { id:'CHG003', project:'翡翠湾花园', drawing:'电气施工图', change:'配电箱位置调整', reason:'施工便利', from:'中建三局', date:'2026-07-05', status:'待审批' },
+];
+
+const qualityChecks = [
+  { id:'QC001', project:'翡翠湾花园', item:'15F主体结构', type:'结构', result:'合格', score:96, inspector:'陈监理', date:'2026-07-15', issue:'' },
+  { id:'QC002', project:'翡翠湾花园', item:'水电预埋', type:'机电', result:'合格', score:92, inspector:'王工', date:'2026-07-12', issue:'' },
+  { id:'QC003', project:'云栖山居', item:'基础钢筋', type:'结构', result:'合格', score:94, inspector:'李监理', date:'2026-07-14', issue:'' },
+  { id:'QC004', project:'云栖山居', item:'防水层', type:'防水', result:'整改中', score:68, inspector:'赵工', date:'2026-07-10', issue:'局部空鼓需返工' },
+  { id:'QC005', project:'翡翠湾花园', item:'外架搭设', type:'安全', result:'合格', score:90, inspector:'陈监理', date:'2026-07-08', issue:'' },
+];
+const safetyRecords = [
+  { project:'翡翠湾花园', safetyDays:287, inspections:156, violations:3, training:12, level:'良好' },
+  { project:'云栖山居', safetyDays:89, inspections:42, violations:1, training:5, level:'优秀' },
+  { project:'星耀城', safetyDays:17, inspections:8, violations:0, training:2, level:'优秀' },
+];
+const progressData = [
+  { project:'翡翠湾花园', planProgress:65, actualProgress:62, deviation:-3, reason:'雨季影响', risk:'yellow', milestone:'主体封顶', mDate:'2026-08-15' },
+  { project:'云栖山居', planProgress:30, actualProgress:28, deviation:-2, reason:'设计变更', risk:'green', milestone:'基础完成', mDate:'2026-08-30' },
+  { project:'星耀城', planProgress:10, actualProgress:8, deviation:-2, reason:'审批延迟', risk:'yellow', milestone:'方案评审', mDate:'2026-08-01' },
+];
+const costData = [
+  { project:'翡翠湾花园', budget:850000000, actual:792000000, ratio:'93.2%', saved:58000000, status:'可控' },
+  { project:'云栖山居', budget:520000000, actual:178000000, ratio:'34.2%', saved:'-', status:'前期' },
+  { project:'星耀城', budget:1200000000, actual:45000000, ratio:'3.8%', saved:'-', status:'前期' },
+];
+
+const complaints = [
+  { id:'CP001', project:'翡翠湾花园', customer:'李先生', type:'工程质量', content:'阳台防水有渗漏迹象', severity:'中', status:'处理中', date:'2026-07-14', assignee:'工程部', deadline:'2026-07-21' },
+  { id:'CP002', project:'翡翠湾花园', customer:'王女士', type:'设计问题', content:'主卧飘窗尺寸与方案不符', severity:'高', status:'处理中', date:'2026-07-13', assignee:'设计部', deadline:'2026-07-18' },
+  { id:'CP003', project:'云栖山居', customer:'赵先生', type:'服务态度', content:'售楼处接待不够专业', severity:'低', status:'已关闭', date:'2026-07-10', assignee:'营销部', deadline:'2026-07-15' },
+  { id:'CP004', project:'翡翠湾花园', customer:'陈女士', type:'进度咨询', content:'询问交付时间能否提前', severity:'低', status:'已回复', date:'2026-07-16', assignee:'客服部', deadline:'2026-07-17' },
+];
+const repairOrders = [
+  { id:'RP001', project:'翡翠湾花园', unit:'3-1501', issue:'墙面裂缝', type:'土建', status:'待派单', urgency:'一般', date:'2026-07-15', sla:'72小时' },
+  { id:'RP002', project:'翡翠湾花园', unit:'5-802', issue:'插座无电', type:'电气', status:'维修中', urgency:'紧急', date:'2026-07-14', sla:'24小时', worker:'电工-刘师傅' },
+  { id:'RP003', project:'翡翠湾花园', unit:'2-1203', issue:'窗户密封条脱落', type:'门窗', status:'已完成', urgency:'一般', date:'2026-07-12', sla:'72小时', worker:'门窗-张师傅', doneDate:'2026-07-14' },
+  { id:'RP004', project:'云栖山居', unit:'1-601', issue:'水压偏低', type:'给排水', status:'待派单', urgency:'一般', date:'2026-07-16', sla:'72小时' },
+];
+const complaintStats = { total:4, pending:2, resolved:1, replied:1, avgResolve:48, satisfaction:4.3 };
+
+// ========== 协同办公 ==========
+function renderCollab() {
+  return `
+    <div class="subtab-bar">
+      <button class="collab-tab active" data-tab="bidding">📋 招投标管理</button>
+      <button class="collab-tab" data-tab="planning">📐 规划设计</button>
+      <button class="collab-tab" data-tab="engineering">🏗️ 工程管理</button>
+      <button class="collab-tab" data-tab="complaint">📞 客诉与维修</button>
+    </div>
+    <div class="collab-content active" id="collab-bidding">${renderBidding()}</div>
+    <div class="collab-content" id="collab-planning">${renderPlanning()}</div>
+    <div class="collab-content" id="collab-engineering">${renderEngineering()}</div>
+    <div class="collab-content" id="collab-complaint">${renderComplaint()}</div>
+  `;
+}
+
+function renderBidding() {
+  return `
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
+      <div class="stat-card"><div class="stat-icon" style="background:#ebf4ff;">📋</div><div><div class="stat-value">${biddingData.length}</div><div class="stat-label">招标项目</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:#fff7ed;">⏳</div><div><div class="stat-value">${biddingData.filter(b=>b.status!=='已定标').length}</div><div class="stat-label">进行中</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:#f0fdf4;">✅</div><div><div class="stat-value">${biddingData.filter(b=>b.status==='已定标').length}</div><div class="stat-label">已定标</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:#faf5ff;">🏢</div><div><div class="stat-value">${bidders.length}</div><div class="stat-label">合格供应商</div></div></div>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header"><h3>📋 招标项目列表</h3><button class="btn-primary" style="padding:6px 14px;font-size:12px;" data-action="bidding-new">+ 新建招标</button></div>
+      <table class="data-table">
+        <thead><tr><th>招标编号</th><th>项目名称</th><th>类型</th><th>预算</th><th>状态</th><th>投标单位</th><th>当前阶段</th><th>截止日期</th><th>操作</th></tr></thead>
+        <tbody>
+          ${biddingData.map(b => `
+            <tr>
+              <td style="color:var(--brand-deep);font-weight:600;">${b.id}</td>
+              <td>${b.name}</td>
+              <td><span class="tag tag-blue">${b.type}</span></td>
+              <td style="font-weight:600;">${b.budget}</td>
+              <td><span class="tag ${b.status==='已定标'?'tag-green':b.status==='评标中'?'tag-orange':'tag-blue'}">${b.status}</span></td>
+              <td>${b.bidders}家</td>
+              <td>${b.stage}</td>
+              <td>${b.deadline}</td>
+              <td>${b.status==='已定标'?`<span style="color:var(--brand-green);font-size:12px;">中标:${b.winner}</span>`:`<button class="btn-sm" style="background:var(--brand-deep);color:#fff;" data-action="bidding-detail" data-id="${b.id}">查看详情</button>`}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>🏢 合格供应商库</h3><button class="btn-sm" style="background:var(--brand-deep);color:#fff;" data-action="bidder-new">+ 新增供应商</button></div>
+      <table class="data-table">
+        <thead><tr><th>供应商名称</th><th>合作项目</th><th>综合评分</th><th>状态</th><th>联系人</th><th>操作</th></tr></thead>
+        <tbody>
+          ${bidders.map(b => `
+            <tr>
+              <td style="font-weight:600;">${b.name}</td>
+              <td>${b.projects}个</td>
+              <td><span style="color:${b.score>=4.5?'var(--brand-green)':'var(--brand-orange)'};font-weight:600;">★ ${b.score}</span></td>
+              <td><span class="tag ${b.status==='合格'?'tag-green':'tag-orange'}">${b.status}</span></td>
+              <td>${b.contact}</td>
+              <td><button class="btn-sm" style="border:1px solid #ddd;" data-action="bidder-detail" data-name="${b.name}">查看</button></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderPlanning() {
+  return `
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
+      <div class="stat-card"><div class="stat-icon" style="background:#ebf4ff;">📐</div><div><div class="stat-value">${designPlans.length}</div><div class="stat-label">设计方案</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:#f0fdf4;">✅</div><div><div class="stat-value">${designPlans.filter(d=>d.status==='已确认').length}</div><div class="stat-label">已确认</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:#fff7ed;">📝</div><div><div class="stat-value">${drawingChanges.length}</div><div class="stat-label">图纸变更</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:#fef2f2;">⏳</div><div><div class="stat-value">${drawingChanges.filter(c=>c.status!=='已实施').length}</div><div class="stat-label">待审批变更</div></div></div>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header"><h3>📐 设计方案管理</h3><button class="btn-primary" style="padding:6px 14px;font-size:12px;" data-action="design-new">+ 新建方案</button></div>
+      <table class="data-table">
+        <thead><tr><th>编号</th><th>所属项目</th><th>方案名称</th><th>版本</th><th>设计单位</th><th>状态</th><th>审核人</th><th>日期</th><th>操作</th></tr></thead>
+        <tbody>
+          ${designPlans.map(d => `
+            <tr>
+              <td style="color:var(--brand-deep);font-weight:600;">${d.id}</td>
+              <td>${d.project}</td>
+              <td>${d.name}</td>
+              <td><span class="tag tag-blue">${d.version}</span></td>
+              <td>${d.designer}</td>
+              <td><span class="tag ${d.status==='已确认'?'tag-green':d.status==='评审中'?'tag-orange':'tag-blue'}">${d.status}</span></td>
+              <td>${d.reviewer}</td>
+              <td>${d.date}</td>
+              <td><button class="btn-sm" style="background:var(--brand-deep);color:#fff;" data-action="design-detail" data-id="${d.id}">查看</button></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>📝 图纸变更记录</h3></div>
+      <table class="data-table">
+        <thead><tr><th>编号</th><th>项目</th><th>图纸名称</th><th>变更内容</th><th>原因</th><th>发起方</th><th>日期</th><th>状态</th></tr></thead>
+        <tbody>
+          ${drawingChanges.map(c => `
+            <tr>
+              <td style="font-weight:600;">${c.id}</td>
+              <td>${c.project}</td>
+              <td>${c.drawing}</td>
+              <td>${c.change}</td>
+              <td>${c.reason}</td>
+              <td>${c.from}</td>
+              <td>${c.date}</td>
+              <td><span class="tag ${c.status==='已实施'?'tag-green':c.status==='审批中'?'tag-orange':'tag-red'}">${c.status}</span>${c.status==='审批中'?` <button class="btn-sm" style="background:#38a169;color:#fff;font-size:10px;margin-left:4px;" data-action="approve-change" data-id="${c.id}">通过</button><button class="btn-sm" style="background:#e53e3e;color:#fff;font-size:10px;margin-left:2px;" data-action="reject-change" data-id="${c.id}">驳回</button>`:''}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderEngineering() {
+  return `
+    <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg,#1a365d,#2d5a8e);color:#fff;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <h3 style="font-size:18px;">🏗️ BIM 协同平台</h3>
+          <p style="font-size:13px;opacity:0.8;margin-top:4px;">三维可视化工程管理 · 碰撞检查 · 4D进度模拟 · 工程量自动统计</p>
+        </div>
+        <button style="background:#fff;color:var(--brand-deep);border:none;padding:10px 24px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;" data-action="bim-enter">🚀 进入BIM平台</button>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:16px;">
+        <div style="flex:1;background:rgba(255,255,255,0.12);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:28px;">🏢</div><div style="font-size:12px;margin-top:4px;">建筑模型</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,0.12);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:28px;">🔧</div><div style="font-size:12px;margin-top:4px;">结构模型</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,0.12);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:28px;">⚡</div><div style="font-size:12px;margin-top:4px;">机电模型</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,0.12);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:28px;">🔄</div><div style="font-size:12px;margin-top:4px;">碰撞检查</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,0.12);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:28px;">📊</div><div style="font-size:12px;margin-top:4px;">4D模拟</div>
+        </div>
+      </div>
+    </div>
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
+      <div class="stat-card"><div class="stat-icon" style="background:#ebf4ff;">✅</div><div><div class="stat-value">${qualityChecks.length}</div><div class="stat-label">质量检查</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:#f0fdf4;">🛡️</div><div><div class="stat-value">287天</div><div class="stat-label">最长安全记录</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:#fff7ed;">📈</div><div><div class="stat-value">93.2%</div><div class="stat-label">造价控制率</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:#faf5ff;">🏗️</div><div><div class="stat-value">3</div><div class="stat-label">在建项目</div></div></div>
+    </div>
+    <div class="flex-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div class="card">
+        <div class="card-header"><h3>✅ 质量检查记录</h3></div>
+        <table class="data-table">
+          <thead><tr><th>项目</th><th>检查项</th><th>类型</th><th>结果</th><th>评分</th><th>检查人</th></tr></thead>
+          <tbody>
+            ${qualityChecks.map(q => `
+              <tr>
+                <td style="font-size:13px;">${q.project}</td>
+                <td>${q.item}</td>
+                <td>${q.type}</td>
+                <td><span class="tag ${q.result==='合格'?'tag-green':'tag-red'}">${q.result}</span></td>
+                <td style="font-weight:600;color:${q.score>=90?'var(--brand-green)':q.score>=70?'var(--brand-orange)':'var(--red)'};">${q.score}分</td>
+                <td>${q.inspector}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>🛡️ 安全管理</h3></div>
+        <table class="data-table">
+          <thead><tr><th>项目</th><th>安全天数</th><th>检查次数</th><th>违章</th><th>培训</th><th>评级</th></tr></thead>
+          <tbody>
+            ${safetyRecords.map(s => `
+              <tr>
+                <td style="font-weight:600;">${s.project}</td>
+                <td style="color:var(--brand-green);font-weight:600;">${s.safetyDays}天</td>
+                <td>${s.inspections}次</td>
+                <td style="color:${s.violations>0?'var(--red)':'var(--brand-green)'};">${s.violations}次</td>
+                <td>${s.training}次</td>
+                <td><span class="tag ${s.level==='优秀'?'tag-green':'tag-orange'}">${s.level}</span></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="flex-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="card">
+        <div class="card-header"><h3>📈 进度跟踪</h3></div>
+        ${progressData.map(p => `
+          <div style="padding:12px;border-bottom:1px solid #f0f0f0;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-weight:600;">${p.project}</span>
+              <span style="font-size:12px;color:var(--brand-orange);">里程碑: ${p.milestone} (${p.mDate})</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <span style="font-size:12px;color:#666;">计划</span>
+              <div style="flex:1;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;">
+                <div style="height:100%;width:${p.planProgress}%;background:#cbd5e0;border-radius:4px;"></div>
+              </div>
+              <span style="font-size:12px;font-weight:600;">${p.planProgress}%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <span style="font-size:12px;color:#666;">实际</span>
+              <div style="flex:1;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;">
+                <div style="height:100%;width:${p.actualProgress}%;background:${p.risk==='yellow'?'var(--brand-orange)':'var(--brand-green)'};border-radius:4px;"></div>
+              </div>
+              <span style="font-size:12px;font-weight:600;color:${p.deviation<0?'var(--red)':'var(--brand-green)'};">${p.actualProgress}% (${p.deviation>=0?'+':''}${p.deviation}%)</span>
+            </div>
+            <div style="font-size:11px;color:#999;">${p.reason}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>💰 造价控制</h3></div>
+        <table class="data-table">
+          <thead><tr><th>项目</th><th>预算</th><th>实际</th><th>比例</th><th>节余</th><th>状态</th></tr></thead>
+          <tbody>
+            ${costData.map(c => `
+              <tr>
+                <td style="font-weight:600;">${c.project}</td>
+                <td>${c.budget>=100000000?(c.budget/100000000).toFixed(1)+'亿':(c.budget/10000).toFixed(0)+'万'}</td>
+                <td>${typeof c.actual==='number'?c.actual>=100000000?(c.actual/100000000).toFixed(1)+'亿':(c.actual/10000).toFixed(0)+'万':c.actual}</td>
+                <td style="font-weight:600;color:${parseFloat(c.ratio)>90?'var(--brand-orange)':'var(--brand-green)'};">${c.ratio}</td>
+                <td style="color:var(--brand-green);font-weight:600;">${typeof c.saved==='number'?c.saved>=10000?(c.saved/10000).toFixed(0)+'万':c.saved:c.saved}</td>
+                <td><span class="tag ${c.status==='可控'?'tag-green':c.status==='前期'?'tag-blue':'tag-red'}">${c.status}</span></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function renderComplaint() {
+  return `
+    <div class="stat-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:16px;">
+      <div class="stat-card"><div class="stat-icon" style="background:#fef2f2;">📞</div><div><div class="stat-value">${complaintStats.total}</div><div class="stat-label">总投诉</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:#fff7ed;">⏳</div><div><div class="stat-value">${complaintStats.pending}</div><div class="stat-label">处理中</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:#f0fdf4;">✅</div><div><div class="stat-value">${complaintStats.resolved}</div><div class="stat-label">已解决</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:#ebf4ff;">⏱️</div><div><div class="stat-value">${complaintStats.avgResolve}h</div><div class="stat-label">平均响应</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:#faf5ff;">⭐</div><div><div class="stat-value">${complaintStats.satisfaction}</div><div class="stat-label">满意度</div></div></div>
+    </div>
+    <div class="flex-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="card">
+        <div class="card-header"><h3>📞 客户投诉列表</h3><button class="btn-primary" style="padding:6px 14px;font-size:12px;" data-action="complaint-new">+ 新建投诉</button></div>
+        <table class="data-table">
+          <thead><tr><th>编号</th><th>客户</th><th>类型</th><th>内容</th><th>严重度</th><th>状态</th><th>截止</th><th>操作</th></tr></thead>
+          <tbody>
+            ${complaints.map(c => `
+              <tr>
+                <td style="font-weight:600;font-size:12px;">${c.id}</td>
+                <td>${c.customer}</td>
+                <td><span class="tag tag-blue">${c.type}</span></td>
+                <td style="font-size:13px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.content}</td>
+                <td><span class="tag ${c.severity==='高'?'tag-red':c.severity==='中'?'tag-orange':'tag-green'}">${c.severity}</span></td>
+                <td><span class="tag ${c.status==='处理中'?'tag-orange':c.status==='已关闭'?'tag-green':'tag-blue'}">${c.status}</span></td>
+                <td style="font-size:12px;">${c.deadline}</td>
+                <td><button class="btn-sm" style="background:var(--brand-deep);color:#fff;font-size:11px;" data-action="complaint-detail" data-id="${c.id}">处理</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>🔧 维修工单看板</h3><button class="btn-primary" style="padding:6px 14px;font-size:12px;" data-action="repair-new">+ 新建工单</button></div>
+        <table class="data-table">
+          <thead><tr><th>编号</th><th>房号</th><th>问题</th><th>类型</th><th>紧急度</th><th>状态</th><th>SLA</th><th>操作</th></tr></thead>
+          <tbody>
+            ${repairOrders.map(r => `
+              <tr>
+                <td style="font-weight:600;font-size:12px;">${r.id}</td>
+                <td>${r.unit}</td>
+                <td style="font-size:13px;">${r.issue}</td>
+                <td><span class="tag tag-blue">${r.type}</span></td>
+                <td><span class="tag ${r.urgency==='紧急'?'tag-red':'tag-green'}">${r.urgency}</span></td>
+                <td><span class="tag ${r.status==='维修中'?'tag-orange':r.status==='已完成'?'tag-green':r.status==='待派单'?'tag-blue':'tag-gray'}">${r.status}</span></td>
+                <td style="font-size:12px;color:${r.status==='已完成'?'var(--brand-green)':'var(--brand-orange)'};">${r.sla}</td>
+                <td><button class="btn-sm" style="background:var(--brand-deep);color:#fff;font-size:11px;" data-action="repair-detail" data-id="${r.id}">处理</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ========== 仪表盘 ==========
+function renderDashboard() {
+  return `
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#ebf4ff;">🏘️</div>
+        <div><div class="stat-value">${dashboardStats.totalProjects}</div><div class="stat-label">在管项目</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#faf5ff;">👥</div>
+        <div><div class="stat-value">${dashboardStats.totalLP}</div><div class="stat-label">LP合伙人</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fff5f7;">⭐</div>
+        <div><div class="stat-value">${dashboardStats.avgCSI}</div><div class="stat-label">综合CSI</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#e6fffa;">💰</div>
+        <div><div class="stat-value">25.7亿</div><div class="stat-label">管理资金</div></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">CSI 趋势</div>
+        <div class="bar-chart">
+          ${csiHistory.map(d => `
+            <div class="bar-col">
+              <div class="bar" style="height:${d.csi*40}px;background:linear-gradient(180deg,#667eea,#764ba2);"></div>
+              <div class="bar-label">${d.month}</div>
+              <div style="font-size:10px;font-weight:600;color:#4a5568;">${d.csi}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚠️ 风险预警</div>
+        ${riskAlerts.map(r => `
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #f0f0f5;">
+            <span class="dot ${r.level==='yellow'?'dot-yellow':'dot-green'}" style="margin-top:6px;"></span>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:500;">${r.project} · ${r.type}</div>
+              <div style="font-size:12px;color:#718096;margin-top:2px;">${r.content}</div>
+            </div>
+            <span style="font-size:11px;color:#a0aec0;">${r.date}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">项目状态概览</div>
+      <table>
+        <thead><tr><th>项目</th><th>阶段</th><th>进度</th><th>预约/总套数</th><th>LP数</th><th>CSI</th><th>总投资</th></tr></thead>
+        <tbody>
+          ${projects.map(p => {
+            const stageInfo = stages.find(s => s.id === p.stage) || {};
+            return `
+            <tr>
+              <td><strong>${p.icon} ${p.name}</strong><br><span style="font-size:11px;color:#718096;">${p.location}</span></td>
+              <td><span class="tag stage-tag-${p.stage}">${stageInfo.name || '-'}</span></td>
+              <td>
+                <div class="progress-bar" style="width:120px;">
+                  <div class="progress-fill" style="width:${Math.round(p.reserved/p.units*100)}%;background:${stageInfo.color||'#667eea'};"></div>
+                </div>
+                <span style="font-size:11px;">${Math.round(p.reserved/p.units*100)}%</span>
+              </td>
+              <td>${p.reserved}/${p.units}</td>
+              <td>${p.lpCount}</td>
+              <td>${p.csi||'-'}</td>
+              <td>${fmtMoney(p.totalInvestment)}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ========== 需求洞察 ==========
+function renderDemand() {
+  return `
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">📍 区域需求热力图</div>
+        ${demandHeatmap.map((d,i) => `
+          <div class="heatmap-item">
+            <div class="heatmap-rank" style="background:${i<3?'#ed8936':i<6?'#667eea':'#a0aec0'}">${i+1}</div>
+            <div class="heatmap-info">
+              <div class="heatmap-name">${d.region}</div>
+              <div class="heatmap-meta">${d.demand} · ${d.price}</div>
+            </div>
+            <div class="heatmap-bar">
+              <div class="heatmap-fill" style="width:${d.score}%;background:linear-gradient(90deg,#667eea,#ed8936);">${d.score}分</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="card">
+        <div class="card-title">👤 客群画像</div>
+        <div class="grid-2" style="gap:12px;">
+          ${customerSegments.map(s => {
+            const deg = s.pct / 100 * 360;
+            return `
+            <div class="pie-card">
+              <div class="pie-chart" style="background:conic-gradient(${s.color} 0deg ${deg}deg, #edf2f7 ${deg}deg 360deg);">
+                <div class="pie-value">${s.pct}%</div>
+              </div>
+              <div class="pie-label">${s.name}</div>
+              <div class="pie-meta">${s.age}岁 · ${s.budget}</div>
+              <div class="pie-meta">${s.demand}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">📈 需求趋势预测</div>
+      <div class="grid-4">
+        ${[
+          {label:'刚需热度',value:'+12.5%',delta:'up'},
+          {label:'改善需求',value:'+8.3%',delta:'up'},
+          {label:'高端市场',value:'+15.2%',delta:'up'},
+          {label:'养老需求',value:'+5.1%',delta:'up'},
+          {label:'投资热度',value:'-2.3%',delta:'down'},
+        ].map(t => `
+          <div class="trend-indicator">
+            <span class="trend-label">${t.label}</span>
+            <span class="trend-value">${t.value}</span>
+            <span class="trend-delta ${t.delta}">${t.delta==='up'?'↑':t.delta==='down'?'↓':'→'}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">🧪 产品概念验证</div>
+      <div class="grid-4">
+        ${[
+          {icon:'🏙️',name:'智慧社区',desc:'AI驱动的社区管理系统，包含智能安防、能耗管理、社区服务',stats:'兴趣度 78% · 购买意向 62%'},
+          {icon:'🌿',name:'绿色建筑',desc:'LEED认证标准，光伏发电、雨水回收、自然通风系统',stats:'兴趣度 85% · 购买意向 71%'},
+          {icon:'🏋️',name:'健康社区',desc:'健康监测、运动设施、社区医疗配套',stats:'兴趣度 72% · 购买意向 58%'},
+          {icon:'🎓',name:'教育社区',desc:'社区内教育配套、托管服务、素质教育课程',stats:'兴趣度 81% · 购买意向 67%'},
+        ].map(c => `
+          <div class="concept-card">
+            <div class="concept-header">
+              <span class="concept-icon">${c.icon}</span>
+              <span class="concept-name">${c.name}</span>
+            </div>
+            <div class="concept-desc">${c.desc}</div>
+            <div class="concept-stats" style="color:#4a5568;">${c.stats}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ========== 项目管理 ==========
+function renderProjects() {
+  return `
+    <div class="stage-filter">
+      <button class="stage-btn active" data-stage="all">全部</button>
+      ${stages.map(s => `<button class="stage-btn" data-stage="${s.id}">${s.icon} ${s.name}</button>`).join('')}
+    </div>
+    ${projects.map(p => {
+      const si = stages.find(s => s.id === p.stage) || {};
+      const stageIdx = p.stage - 1;
+      return `
+      <div class="project-card" data-stage="${p.stage}">
+        <div class="project-header">
+          <span class="project-icon">${p.icon}</span>
+          <div style="flex:1;">
+            <span class="project-name">${p.name}</span>
+            <span class="project-loc" style="margin-left:8px;">${p.location}</span>
+          </div>
+          <span class="tag stage-tag-${p.stage}">${si.name}</span>
+        </div>
+        <div style="font-size:13px;color:#718096;">${si.name}阶段 · ${p.areaRange} · 均价${fmt(p.unitPrice)}元/㎡</div>
+        <div class="mini-stages">
+          ${stages.map((s,i) => `<div class="mini-stage ${i<=stageIdx?'filled':''}" style="${i<=stageIdx?'background:'+s.color:''}"></div>`).join('')}
+        </div>
+        <div class="project-metrics">
+          <div class="project-metric"><div class="metric-value">${p.units}</div><div class="metric-label">总套数</div></div>
+          <div class="project-metric"><div class="metric-value">${p.reserved}</div><div class="metric-label">已预约</div></div>
+          <div class="project-metric"><div class="metric-value">${Math.round(p.reserved/p.units*100)}%</div><div class="metric-label">预约率</div></div>
+          <div class="project-metric"><div class="metric-value">${p.lpCount}</div><div class="metric-label">LP人数</div></div>
+          <div class="project-metric"><div class="metric-value">${p.csi||'-'}</div><div class="metric-label">CSI评分</div></div>
+          <div class="project-metric"><div class="metric-value">${fmtMoney(p.totalInvestment)}</div><div class="metric-label">总投资</div></div>
+        </div>
+        <div class="project-actions">
+          <button class="btn btn-outline btn-sm">查看详情</button>
+          <button class="btn btn-outline btn-sm">阶段管理</button>
+          <button class="btn btn-outline btn-sm">LP沟通</button>
+          <button class="btn btn-primary btn-sm">下一阶段</button>
+        </div>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+// ========== 客户评价 ==========
+function renderEvaluation() {
+  return `
+    <div class="subtabs">
+      <div class="subtab active" data-tab="csi-overview">CSI总览</div>
+      <div class="subtab" data-tab="touchpoint">触点分析</div>
+      <div class="subtab" data-tab="tickets">改进工单</div>
+    </div>
+    <div class="subtab-content active" id="csi-overview">
+      <div class="grid-2">
+        <div class="card" style="text-align:center;">
+          <div class="card-title">综合CSI评分</div>
+          <svg width="180" height="180" viewBox="0 0 180 180">
+            <circle cx="90" cy="90" r="75" fill="none" stroke="#edf2f7" stroke-width="12"/>
+            <circle cx="90" cy="90" r="75" fill="none" stroke="url(#gaugeGrad)" stroke-width="12"
+              stroke-dasharray="${4.5/5*471} 471" stroke-linecap="round"/>
+            <defs><linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#ed8936"/><stop offset="100%" stop-color="#38a169"/>
+            </linearGradient></defs>
+            <text x="90" y="85" text-anchor="middle" font-size="40" font-weight="700" fill="#1a365d" dominant-baseline="middle">4.5</text>
+            <text x="90" y="115" text-anchor="middle" font-size="14" fill="#718096" dominant-baseline="middle">/ 5.0</text>
+          </svg>
+          <div style="margin-top:12px;font-size:13px;color:#718096;">综合客户满意度</div>
+        </div>
+        <div class="card">
+          <div class="card-title">NPS 趋势</div>
+          <div class="bar-chart">
+            ${csiHistory.map(d => `
+              <div class="bar-col">
+                <div class="bar" style="height:${d.nps}px;background:linear-gradient(180deg,#ed8936,#fa709a);"></div>
+                <div class="bar-label">${d.month}</div>
+                <div style="font-size:10px;font-weight:600;">${d.nps}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="grid-4" style="margin-top:20px;">
+        ${[
+          {label:'评价总数',value:'2,847',icon:'📝'},
+          {label:'正面评价率',value:'87.3%',icon:'👍'},
+          {label:'平均回复时间',value:'4.2小时',icon:'⏱️'},
+          {label:'建议采纳率',value:'72.5%',icon:'💡'},
+        ].map(k => `
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#ebf4ff;font-size:20px;">${k.icon}</div>
+            <div><div class="stat-value" style="font-size:18px;">${k.value}</div><div class="stat-label">${k.label}</div></div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="subtab-content" id="touchpoint">
+      <div class="card">
+        <div class="card-title">触点评分分析</div>
+        ${touchpoints.map(t => {
+          const colors = {up:'#38a169',down:'#e53e3e',stable:'#718096'};
+          return `
+          <div class="touchpoint-row">
+            <span class="touchpoint-name">${t.name}</span>
+            <div class="touchpoint-bar-wrap">
+              <div class="touchpoint-bar" style="width:${t.score/5*100}%;background:linear-gradient(90deg,#667eea,#764ba2);">${t.score}</div>
+            </div>
+            <span class="touchpoint-stats">${t.count}次 · <span style="color:${colors[t.trend]}">${t.trend==='up'?'↑':t.trend==='down'?'↓':'→'}</span></span>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="card" style="margin-top:20px;">
+        <div class="card-title">最新评价</div>
+        ${evaluations.map(e => `
+          <div class="eval-item">
+            <div class="eval-header">
+              <span class="eval-user">${e.user} · ${e.project} · ${e.stage}</span>
+              <span class="eval-score">⭐ ${e.score}</span>
+            </div>
+            <div class="eval-text">${e.text}</div>
+            <div class="eval-meta">${e.date} · ${e.sentiment==='positive'?'😊 正面':e.sentiment==='negative'?'😞 负面':'😐 中性'}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="subtab-content" id="tickets">
+      <div class="card">
+        <table>
+          <thead><tr><th>ID</th><th>项目</th><th>问题</th><th>来源</th><th>严重度</th><th>状态</th><th>负责人</th><th>截止日期</th></tr></thead>
+          <tbody>
+            ${tickets.map(t => `
+              <tr>
+                <td><code style="background:#f7fafc;padding:2px 6px;border-radius:4px;font-size:12px;">${t.id}</code></td>
+                <td>${t.project}</td>
+                <td>${t.issue}</td>
+                <td><span class="tag tag-blue">${t.source}</span></td>
+                <td><span class="severity-${t.severity}">${t.severity==='yellow'?'⚠️ 中':t.severity==='green'?'✅ 低':'🔴 高'}</span></td>
+                <td><span class="tag ${t.status==='已完成'?'tag-green':t.status==='处理中'?'tag-orange':'tag-purple'}">${t.status}</span></td>
+                <td>${t.assignee}</td>
+                <td>${t.due}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ========== LP管理 ==========
+function renderLP() {
+  const totalInvest = lpList.reduce((s,l) => s + parseInt(l.invest) || 0, 0);
+  return `
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#ebf4ff;">👥</div>
+        <div><div class="stat-value">${lpList.length}</div><div class="stat-label">LP总数</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#faf5ff;">⭐</div>
+        <div><div class="stat-value">${lpList.filter(l=>l.level==='VIP').length}</div><div class="stat-label">VIP LP</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#e6fffa;">💰</div>
+        <div><div class="stat-value">${totalInvest}万</div><div class="stat-label">总投资额</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fff5f7;">📊</div>
+        <div><div class="stat-value">${lpList.reduce((s,l)=>s+l.projects,0)}</div><div class="stat-label">参与项目</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">LP列表</div>
+      <table>
+        <thead><tr><th>姓名</th><th>等级</th><th>投资额</th><th>项目数</th><th>加入日期</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody>
+          ${lpList.map(l => `
+            <tr>
+              <td><strong>${l.name}</strong></td>
+              <td><span class="tag ${l.level==='VIP'?'tag-orange':l.level==='潜在'?'tag-purple':'tag-blue'}">${l.level}</span></td>
+              <td>${l.invest}</td>
+              <td>${l.projects}</td>
+              <td>${l.date}</td>
+              <td><span class="dot ${l.status==='active'?'dot-green':'dot-yellow'}"></span>${l.status==='active'?'活跃':'待激活'}</td>
+              <td><button class="btn btn-outline btn-sm">详情</button> <button class="btn btn-outline btn-sm">联系</button></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="grid-2" style="margin-top:20px;">
+      <div class="card">
+        <div class="card-title">💰 资金监管概览</div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f5;">
+          <span style="font-size:13px;">已募集资金</span><span style="font-weight:600;">18.2亿</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f5;">
+          <span style="font-size:13px;">已投入建设</span><span style="font-weight:600;">12.8亿</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f5;">
+          <span style="font-size:13px;">托管账户余额</span><span style="font-weight:600;">5.4亿</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;">
+          <span style="font-size:13px;">预计回报率</span><span style="font-weight:600;color:#ed8936;">8.5%</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🧮 分红计算器</div>
+        <div class="calc-input-group">
+          <label>投资金额（万元）</label>
+          <input type="number" class="calc-input" id="calcInvest" value="100" oninput="calcDividend()">
+        </div>
+        <div class="calc-input-group">
+          <label>预计年化收益率（%）</label>
+          <input type="number" class="calc-input" id="calcRate" value="8.5" oninput="calcDividend()">
+        </div>
+        <div class="calc-result" id="calcResult">
+          <div class="result-item"><span>预计年分红</span><span>85,000元</span></div>
+          <div class="result-item"><span>月均分红</span><span>7,083元</span></div>
+          <div class="result-item"><span>3年累计</span><span>255,000元</span></div>
+          <div class="result-item"><span>总回报率</span><span>25.5%</span></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function calcDividend() {
+  const invest = parseFloat(document.getElementById('calcInvest')?.value) || 0;
+  const rate = parseFloat(document.getElementById('calcRate')?.value) || 0;
+  const annual = invest * 10000 * rate / 100;
+  const monthly = annual / 12;
+  const threeYear = annual * 3;
+  document.getElementById('calcResult').innerHTML = `
+    <div class="result-item"><span>预计年分红</span><span>${annual.toLocaleString()}元</span></div>
+    <div class="result-item"><span>月均分红</span><span>${monthly.toLocaleString()}元</span></div>
+    <div class="result-item"><span>3年累计</span><span>${threeYear.toLocaleString()}元</span></div>
+    <div class="result-item"><span>总回报率</span><span>${(rate*3).toFixed(1)}%</span></div>
+  `;
+}
+
+// ========== 设计与工程 ==========
+function renderDesign() {
+  return `
+    <div class="card">
+      <div class="card-title">📐 模块化产品库</div>
+      <div class="grid-3">
+        ${designLib.map(d => `
+          <div class="concept-card" style="border:1px solid #f0f0f5;">
+            <div class="concept-header">
+              <span class="concept-icon">${d.icon}</span>
+              <span class="concept-name">${d.name}</span>
+            </div>
+            <div style="font-size:12px;color:#718096;margin-bottom:8px;">${d.type}</div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;">
+              <span>⭐ ${d.rating}</span>
+              <span>使用 ${d.usage}次</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">🏗️ 工程进度管理</div>
+      ${engineering.map(e => `
+        <div class="eng-card">
+          <div class="eng-header">
+            <span class="eng-name">${e.project}</span>
+            <span class="eng-progress-text">${e.progress}%</span>
+          </div>
+          <div class="progress-bar" style="height:10px;">
+            <div class="progress-fill" style="width:${e.progress}%;background:linear-gradient(90deg,#667eea,#38a169);"></div>
+          </div>
+          <div class="eng-meta">
+            <div class="meta-item"><div class="meta-value">${e.quality||'-'}</div><div class="meta-label">质量评分</div></div>
+            <div class="meta-item"><div class="meta-value">${e.safetyDays}</div><div class="meta-label">安全天数</div></div>
+            <div class="meta-item"><div class="meta-value">${e.workers}</div><div class="meta-label">在岗工人</div></div>
+            <div class="meta-item"><div class="meta-value">${e.progress}%</div><div class="meta-label">工程进度</div></div>
+          </div>
+          <div class="eng-next">📋 下一步：${e.next}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">🔍 质量检查记录</div>
+      <table>
+        <thead><tr><th>项目</th><th>检查项</th><th>结果</th><th>检查人</th><th>日期</th></tr></thead>
+        <tbody>
+          ${[
+            {p:'翡翠湾花园',item:'主体结构验收',result:'合格',person:'王监理',date:'2026-07-10'},
+            {p:'翡翠湾花园',item:'水电隐蔽工程',result:'合格',person:'李工',date:'2026-07-08'},
+            {p:'翡翠湾花园',item:'防水工程',result:'整改中',person:'张监理',date:'2026-07-05'},
+            {p:'云栖山居',item:'地基验收',result:'合格',person:'赵监理',date:'2026-07-12'},
+            {p:'云栖山居',item:'钢筋绑扎',result:'合格',person:'陈工',date:'2026-07-09'},
+          ].map(q => `
+            <tr>
+              <td>${q.p}</td><td>${q.item}</td>
+              <td><span class="tag ${q.result==='合格'?'tag-green':'tag-orange'}">${q.result}</span></td>
+              <td>${q.person}</td><td>${q.date}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ========== AI引擎 ==========
+function renderAI() {
+  return `
+    <div class="grid-4">
+      ${aiModels.map(m => `
+        <div class="model-card">
+          <div class="model-icon">${m.icon}</div>
+          <div class="model-name">${m.name}</div>
+          <div class="model-meta">
+            <div class="model-meta-item"><span class="meta-label">准确率</span><br><span class="meta-value" style="color:#38a169;">${m.accuracy}</span></div>
+            <div class="model-meta-item"><span class="meta-label">样本</span><br><span class="meta-value">${m.samples}</span></div>
+            <div class="model-meta-item"><span class="meta-label">版本</span><br><span class="meta-value">${m.version}</span></div>
+            <div class="model-meta-item"><span class="meta-label">训练</span><br><span class="meta-value">${m.trained}</span></div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">🔄 数据飞轮状态</div>
+      <div style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+          <span>数据采集</span><span>8,450条/天</span>
+        </div>
+        <div class="flywheel"><div class="flywheel-fill" style="width:85%;">85%</div></div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+          <span>模型训练</span><span>每日自动</span>
+        </div>
+        <div class="flywheel"><div class="flywheel-fill" style="width:92%;">92%</div></div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+          <span>效果反馈</span><span>87.3%正向</span>
+        </div>
+        <div class="flywheel"><div class="flywheel-fill" style="width:87%;">87%</div></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+          <span>闭环优化</span><span>每周迭代</span>
+        </div>
+        <div class="flywheel"><div class="flywheel-fill" style="width:78%;">78%</div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">💡 模型优化建议</div>
+      ${[
+        {icon:'📊',title:'增加训练样本多样性',desc:'建议补充之江、良渚等板块的需求数据，提升模型泛化能力',priority:'高'},
+        {icon:'🔧',title:'服务匹配引擎特征工程',desc:'当前准确率79.8%，建议增加客户行为序列特征提升至85%+',priority:'中'},
+        {icon:'⚡',title:'模型推理加速',desc:'需求预测引擎推理延迟可优化至<100ms，支持实时推荐场景',priority:'低'},
+      ].map(r => `
+        <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f0f0f5;">
+          <span style="font-size:24px;">${r.icon}</span>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:500;">${r.title}</div>
+            <div style="font-size:12px;color:#718096;margin-top:4px;">${r.desc}</div>
+          </div>
+          <span class="tag ${r.priority==='高'?'tag-orange':r.priority==='中'?'tag-blue':'tag-green'}">${r.priority}优先</span>
+        </div>
+      `).join('')}
+    </div>
+    <!-- 会员行为反馈闭环 -->
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">🔁 用户行为→算法迭代闭环</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;text-align:center;">
+        <div style="padding:14px;background:#ebf4ff;border-radius:10px;">
+          <div style="font-size:24px;">👁️</div>
+          <div style="font-weight:700;font-size:14px;margin:6px 0;">浏览行为</div>
+          <div style="font-size:11px;color:#718096;">14,200条/天</div>
+          <div style="font-size:10px;color:#38a169;">→ 偏好标签更新</div>
+        </div>
+        <div style="padding:14px;background:#f0fdf4;border-radius:10px;">
+          <div style="font-size:24px;">⭐</div>
+          <div style="font-weight:700;font-size:14px;margin:6px 0;">CSI评价</div>
+          <div style="font-size:11px;color:#718096;">1,250条/天</div>
+          <div style="font-size:10px;color:#38a169;">→ 质量模型校准</div>
+        </div>
+        <div style="padding:14px;background:#fff7ed;border-radius:10px;">
+          <div style="font-size:24px;">🔄</div>
+          <div style="font-weight:700;font-size:14px;margin:6px 0;">转化跟踪</div>
+          <div style="font-size:11px;color:#718096;">转化率 18.4%</div>
+          <div style="font-size:10px;color:#38a169;">→ 推荐权重优化</div>
+        </div>
+        <div style="padding:14px;background:#faf5ff;border-radius:10px;">
+          <div style="font-size:24px;">🧬</div>
+          <div style="font-weight:700;font-size:14px;margin:6px 0;">模型迭代</div>
+          <div style="font-size:11px;color:#718096;">每周自动</div>
+          <div style="font-size:10px;color:#38a169;">→ 准确率+0.5%/周</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:12px;background:#fffbeb;border:1px solid #fbd38d;border-radius:8px;font-size:12px;color:#92400e;">
+        💡 <b>优化提示</b>：当前L4评价数据采集率仅68%，建议在项目关键节点（主体封顶、装修完成）自动推送评价提醒，提升数据闭环完整性。
+      </div>
+    </div>
+  `;
+}
+
+// ========== 会员数据看板 ==========
+// 会员数据模型
+const memberStats = {
+  totalRegistered: 1258, activeMonth: 487, activeWeek: 203, activeToday: 67,
+  tierDist: { bronze:620, silver:340, gold:185, diamond:72, lp_partner:41 },
+  newToday: 12, newWeek: 89, newMonth: 312,
+  avgSessionMin: 8.5, avgPageViews: 14.2, bounceRate: '23.7%',
+  conversionRate: '18.4%', retentionDay7: '62.3%', retentionMonth: '41.8%',
+};
+const MEMBER_TIERS = { bronze:'青铜会员', silver:'白银会员', gold:'黄金会员', diamond:'钻石会员', lp_partner:'LP合伙人' };
+const behaviorStats = {
+  topEvents: [
+    { event:'浏览项目', count:8450, pct:'38.2%' },
+    { event:'观看视频', count:4320, pct:'19.5%' },
+    { event:'表达需求', count:2180, pct:'9.9%' },
+    { event:'查看投资', count:1950, pct:'8.8%' },
+    { event:'搜索', count:1680, pct:'7.6%' },
+    { event:'评价', count:1250, pct:'5.7%' },
+    { event:'分享', count:980, pct:'4.4%' },
+    { event:'收藏', count:1320, pct:'6.0%' },
+  ],
+  topTags: [
+    { tag:'TOD地铁房', count:520, pct:'41.3%' },
+    { tag:'改善型住房', count:485, pct:'38.5%' },
+    { tag:'学区刚需', count:410, pct:'32.6%' },
+    { tag:'一线江景', count:356, pct:'28.3%' },
+    { tag:'低密改善', count:298, pct:'23.7%' },
+    { tag:'四房以上', count:275, pct:'21.9%' },
+    { tag:'精装交付', count:240, pct:'19.1%' },
+    { tag:'养老康养', count:185, pct:'14.7%' },
+  ],
+  deviceDist: { ios:'52.3%', android:'44.8%', web:'2.9%' },
+  hourDist: [4.2,2.1,1.5,1.2,1.8,3.5,7.2,11.5,14.8,16.2,15.5,13.8,12.2,14.5,16.8,18.2,17.5,15.2,13.8,11.2,9.5,7.8,6.2,5.5],
+};
+
+function renderMembers() {
+  return `
+    <!-- 会员总览卡片 -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#ebf4ff;">👥</div>
+        <div><div class="stat-value">${memberStats.totalRegistered.toLocaleString()}</div><div class="stat-label">注册会员</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#f0fdf4;">📈</div>
+        <div><div class="stat-value">${memberStats.activeMonth.toLocaleString()}</div><div class="stat-label">月活跃用户</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fff7ed;">🆕</div>
+        <div><div class="stat-value">+${memberStats.newToday}</div><div class="stat-label">今日新增</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#faf5ff;">🎯</div>
+        <div><div class="stat-value">${memberStats.conversionRate}</div><div class="stat-label">转化率</div></div>
+      </div>
+    </div>
+
+    <!-- 第二行：留存+活跃 -->
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#e6fffa;">⏱️</div>
+        <div><div class="stat-value">${memberStats.avgSessionMin}min</div><div class="stat-label">平均会话时长</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fff5f7;">📄</div>
+        <div><div class="stat-value">${memberStats.avgPageViews}</div><div class="stat-label">人均浏览页数</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fefcbf;">🔄</div>
+        <div><div class="stat-value">${memberStats.retentionDay7}</div><div class="stat-label">7日留存</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#f0fff4;">📉</div>
+        <div><div class="stat-value">${memberStats.bounceRate}</div><div class="stat-label">跳出率</div></div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:20px;">
+      <!-- 会员等级分布 -->
+      <div class="card">
+        <div class="card-title">🏅 会员等级分布</div>
+        ${Object.entries(memberStats.tierDist).map(([tier, count]) => {
+          const names = { bronze:'青铜', silver:'白银', gold:'黄金', diamond:'钻石', lp_partner:'LP合伙人' };
+          const colors = { bronze:'#cd7f32', silver:'#a0aec0', gold:'#f6ad55', diamond:'#667eea', lp_partner:'#ed8936' };
+          const pct = (count / memberStats.totalRegistered * 100).toFixed(1);
+          return `
+            <div style="margin-bottom:12px;">
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+                <span style="font-weight:500;">${names[tier] || tier}</span>
+                <span style="color:#718096;">${count}人 (${pct}%)</span>
+              </div>
+              <div style="height:8px;background:#edf2f7;border-radius:4px;overflow:hidden;">
+                <div style="height:100%;background:${colors[tier] || '#a0aec0'};width:${pct}%;border-radius:4px;"></div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <!-- 行为事件分布 -->
+      <div class="card">
+        <div class="card-title">📊 用户行为事件分布</div>
+        ${behaviorStats.topEvents.slice(0,6).map(e => `
+          <div style="margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;">
+              <span>${e.event}</span><span style="color:#718096;">${e.count.toLocaleString()}次 (${e.pct})</span>
+            </div>
+            <div style="height:6px;background:#edf2f7;border-radius:3px;overflow:hidden;">
+              <div style="height:100%;background:linear-gradient(90deg,#667eea,#764ba2);width:${e.pct};border-radius:3px;"></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:20px;">
+      <!-- 热门偏好标签 -->
+      <div class="card">
+        <div class="card-title">🏷️ 用户偏好标签 TOP8</div>
+        ${behaviorStats.topTags.map((t, i) => `
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f5;">
+            <span style="font-weight:700;color:#a0aec0;width:20px;">#${i+1}</span>
+            <span style="flex:1;font-size:13px;font-weight:500;">${t.tag}</span>
+            <span style="font-size:12px;color:#718096;">${t.count}人</span>
+            <span style="font-size:12px;font-weight:600;color:#2d5a8e;">${t.pct}</span>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- 设备/时间分布 -->
+      <div class="card">
+        <div class="card-title">📱 设备分布</div>
+        ${Object.entries(behaviorStats.deviceDist).map(([d, pct]) => `
+          <div style="margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;">
+              <span>${d==='ios'?'🍎 iOS':d==='android'?'🤖 Android':'💻 Web'}</span><span>${pct}</span>
+            </div>
+            <div style="height:6px;background:#edf2f7;border-radius:3px;overflow:hidden;">
+              <div style="height:100%;background:${d==='ios'?'#667eea':d==='android'?'#38a169':'#ed8936'};width:${pct};border-radius:3px;"></div>
+            </div>
+          </div>
+        `).join('')}
+        <div class="card-title" style="margin-top:16px;">⏰ 时段活跃分布（24h）</div>
+        <div style="display:flex;align-items:flex-end;gap:2px;height:80px;">
+          ${behaviorStats.hourDist.map((v, h) => {
+            const maxH = Math.max(...behaviorStats.hourDist);
+            const height = Math.max(4, (v / maxH) * 70);
+            const isPeak = v > 12;
+            return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;" title="${h}时: ${v}%">
+              <div style="width:100%;height:${height}px;background:${isPeak?'#ed8936':'#667eea'};border-radius:2px 2px 0 0;opacity:0.85;"></div>
+              ${h%6===0?`<span style="font-size:9px;color:#a0aec0;margin-top:2px;">${h}h</span>`:''}
+            </div>`;
+          }).join('')}
+        </div>
+        <div style="font-size:11px;color:#718096;margin-top:4px;text-align:center;">高峰时段 11:00-13:00 / 17:00-20:00</div>
+      </div>
+    </div>
+
+    <!-- 算法迭代状态面板 -->
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">🔄 推荐算法迭代状态</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
+        <div style="background:#f7fafc;border-radius:10px;padding:16px;text-align:center;">
+          <div style="font-size:28px;margin-bottom:4px;">🧠</div>
+          <div style="font-size:20px;font-weight:700;color:#1a365d;">V2.4.1</div>
+          <div style="font-size:11px;color:#718096;">推荐引擎版本</div>
+          <div style="font-size:12px;color:#38a169;margin-top:4px;">准确率 87.3% ↑2.1%</div>
+        </div>
+        <div style="background:#f7fafc;border-radius:10px;padding:16px;text-align:center;">
+          <div style="font-size:28px;margin-bottom:4px;">📦</div>
+          <div style="font-size:20px;font-weight:700;color:#1a365d;">22,180</div>
+          <div style="font-size:11px;color:#718096;">训练样本总量</div>
+          <div style="font-size:12px;color:#38a169;margin-top:4px;">+845 今日新增</div>
+        </div>
+        <div style="background:#f7fafc;border-radius:10px;padding:16px;text-align:center;">
+          <div style="font-size:28px;margin-bottom:4px;">⚡</div>
+          <div style="font-size:20px;font-weight:700;color:#1a365d;">142ms</div>
+          <div style="font-size:11px;color:#718096;">平均推理延迟</div>
+          <div style="font-size:12px;color:#38a169;margin-top:4px;">↓18ms 本周优化</div>
+        </div>
+      </div>
+
+      <!-- 数据飞轮分层 -->
+      <div class="card-title" style="font-size:14px;">📊 数据飞轮五层状态</div>
+      ${[
+        {layer:'L1 需求数据',desc:'用户偏好标签、搜索关键词、需求表达',count:'8,450条/天',pct:92,color:'#667eea'},
+        {layer:'L2 交互数据',desc:'浏览行为、点击路径、停留时长、分享收藏',count:'14,200条/天',pct:88,color:'#764ba2'},
+        {layer:'L3 过程数据',desc:'项目参与、共创投票、阶段评价',count:'3,120条/天',pct:75,color:'#ed8936'},
+        {layer:'L4 评价数据',desc:'CSI评分、NPS、阶段满意度、文本情感',count:'1,250条/天',pct:68,color:'#38a169'},
+        {layer:'L5 运营数据',desc:'分红记录、投诉维修、长期留存、转介绍',count:'580条/天',pct:52,color:'#e53e3e'},
+      ].map(l => `
+        <div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+            <span style="font-weight:600;">${l.layer}</span>
+            <span style="font-size:11px;color:#718096;">${l.desc}</span>
+            <span style="font-size:11px;color:#a0aec0;">${l.count}</span>
+          </div>
+          <div style="height:6px;background:#edf2f7;border-radius:3px;overflow:hidden;">
+            <div style="height:100%;background:${l.color};width:${l.pct}%;border-radius:3px;"></div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <!-- 最近注册会员列表 -->
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">🆕 最近注册会员</div>
+      <table class="data-table">
+        <thead><tr><th>会员ID</th><th>昵称</th><th>手机号</th><th>等级</th><th>偏好标签</th><th>注册时间</th><th>积分</th><th>行为数</th></tr></thead>
+        <tbody>
+          ${[
+            {id:'FZR20241001',name:'陈建国',phone:'138****1111',tier:'lp_partner',tags:'改善型,四房以上,学区',time:'2024-03-12',points:8620,events:487},
+            {id:'FZR20241002',name:'张丽华',phone:'139****2222',tier:'gold',tags:'江景,低密,精装',time:'2024-06-05',points:3250,events:203},
+            {id:'FZR20241005',name:'刘强东',phone:'136****5555',tier:'silver',tags:'TOD地铁,刚需首套',time:'2024-10-15',points:890,events:67},
+            {id:'FZR20241008',name:'孙晓萌',phone:'185****8888',tier:'bronze',tags:'养老康养,医疗配套',time:'2025-01-20',points:320,events:28},
+            {id:'FZR20241012',name:'周杰',phone:'177****9999',tier:'bronze',tags:'低总价,三房两厅',time:'2025-02-08',points:180,events:15},
+            {id:'FZR20241015',name:'吴芳',phone:'133****6666',tier:'silver',tags:'高端豪宅,一线江景',time:'2025-02-22',points:560,events:42},
+          ].map(u => `
+            <tr>
+              <td style="color:#2d5a8e;font-weight:600;">${u.id}</td>
+              <td>${u.name}</td>
+              <td>${u.phone}</td>
+              <td><span class="tag ${u.tier==='lp_partner'?'tag-orange':u.tier==='gold'?'tag-blue':u.tier==='silver'?'tag-green':'tag-blue'}">${MEMBER_TIERS[u.tier]||u.tier}</span></td>
+              <td style="font-size:11px;">${u.tags}</td>
+              <td style="font-size:12px;">${u.time}</td>
+              <td>${u.points}</td>
+              <td>${u.events}次</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ========== 设置 ==========
+function renderSettings() {
+  return `
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">👥 团队管理</div>
+        <div class="member-list" style="grid-template-columns:1fr 1fr;">
+          ${[
+            {name:'周志远',role:'GP管理员',color:'#667eea',online:true},
+            {name:'李明',role:'工程总监',color:'#764ba2',online:true},
+            {name:'王芳',role:'产品经理',color:'#f093fb',online:true},
+            {name:'陈工',role:'设计总监',color:'#4facfe',online:false},
+            {name:'赵敏',role:'运营经理',color:'#43e97b',online:true},
+            {name:'刘洋',role:'数据分析师',color:'#fa709a',online:true},
+          ].map(m => `
+            <div class="member-card">
+              <div class="member-avatar" style="background:${m.color};">${m.name[0]}</div>
+              <div class="member-info">
+                <div class="member-name">${m.name}</div>
+                <div class="member-role">${m.role}</div>
+              </div>
+              <div class="member-status ${m.online?'online':'offline'}"></div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔐 角色权限</div>
+        <table class="perm-table">
+          <thead><tr><th>角色</th><th>仪表盘</th><th>需求</th><th>项目</th><th>评价</th><th>LP</th><th>设计</th><th>AI</th><th>设置</th></tr></thead>
+          <tbody>
+            ${[
+              {role:'超级管理员',p:[1,1,1,1,1,1,1,1]},
+              {role:'GP管理员',p:[1,1,1,1,1,1,1,0]},
+              {role:'项目经理',p:[1,1,1,1,0,1,0,0]},
+              {role:'设计总监',p:[0,0,0,0,0,1,0,0]},
+              {role:'运营经理',p:[1,1,0,1,1,0,0,0]},
+              {role:'数据分析师',p:[1,1,0,0,0,0,1,0]},
+            ].map(r => `
+              <tr>
+                <td>${r.role}</td>
+                ${r.p.map(v => `<td>${v?'<span class="perm-check">✓</span>':'<span class="perm-dash">—</span>'}</td>`).join('')}
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">⚙️ 系统设置</div>
+      <div class="setting-row">
+        <div><div class="setting-label">自动预警通知</div><div class="setting-desc">项目进度异常时自动通知相关负责人</div></div>
+        <div class="toggle on"></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">AI辅助决策</div><div class="setting-desc">启用AI模型辅助项目决策分析</div></div>
+        <div class="toggle on"></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">LP自动报告</div><div class="setting-desc">每月自动生成LP投资报告并推送</div></div>
+        <div class="toggle on"></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">质量自动巡检</div><div class="setting-desc">AI自动检测工程质量异常</div></div>
+        <div class="toggle"></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-label">数据导出权限</div><div class="setting-desc">允许团队导出分析数据</div></div>
+        <div class="toggle on"></div>
+      </div>
+    </div>
+  `;
+}
+
+// 初始渲染
+renderPage('dashboard');
+
+// ====== 语音指令执行系统 ======
+// 语音命令 → 直接执行UI操作（非朗读按钮文字）
+const Voice = {
+  listening: false,
+  enabled: true,
+  recognition: null,
+  synth: window.speechSynthesis,
+
+  init() {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      console.log('语音识别不支持，使用文本输入模式');
+      this.createUI();
+      return;
+    }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    this.recognition = new SR();
+    this.recognition.lang = 'zh-CN';
+    this.recognition.continuous = false;
+    this.recognition.interimResults = false;
+    this.recognition.onresult = (e) => {
+      const cmd = e.results[0][0].transcript.trim();
+      this.handleCommand(cmd);
+    };
+    this.recognition.onend = () => { this.listening = false; this.updateBtn(); };
+    this.recognition.onerror = () => { this.listening = false; this.updateBtn(); };
+    this.createUI();
+  },
+
+  speak(text, rate) {
+    if (!this.enabled || !this.synth) return;
+    this.synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'zh-CN'; u.rate = rate || 1; u.volume = 0.9;
+    this.synth.speak(u);
+  },
+
+  // 在协同办公页面内执行操作
+  execInCollab(action, id) {
+    // 先确保在协同办公页面
+    const currentPage = document.querySelector('.nav-item.active')?.dataset?.page;
+    if (currentPage !== 'collab') {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      const item = document.querySelector('[data-page="collab"]');
+      if (item) { item.classList.add('active'); document.getElementById('pageTitle').textContent = pageTitles['collab']; renderPage('collab'); }
+    }
+    // 延迟执行以等待DOM渲染
+    setTimeout(() => {
+      if (id) {
+        const btn = document.querySelector(`[data-action="${action}"][data-id="${id}"]`);
+        if (btn) { handleCollabAction(action, btn); this.speak('已打开详情'); return; }
+      }
+      const btn = document.querySelector(`[data-action="${action}"]`);
+      if (btn) { handleCollabAction(action, btn); this.speak('已执行'); }
+      else this.speak('未找到对应操作');
+    }, 300);
+  },
+
+  // 切换协同办公子tab
+  switchCollabTab(tab) {
+    const currentPage = document.querySelector('.nav-item.active')?.dataset?.page;
+    if (currentPage !== 'collab') {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      const item = document.querySelector('[data-page="collab"]');
+      if (item) { item.classList.add('active'); document.getElementById('pageTitle').textContent = pageTitles['collab']; renderPage('collab'); }
+    }
+    setTimeout(() => {
+      const tabBtn = document.querySelector(`.collab-tab[data-tab="${tab}"]`);
+      if (tabBtn) { tabBtn.click(); this.speak('已切换'); }
+    }, 300);
+  },
+
+  handleCommand(cmd) {
+    showToast('🎤 ' + cmd, '');
+    const c = cmd.toLowerCase().replace(/\s+/g, '');
+
+    // ===== 页面导航 =====
+    const navMap = [
+      { kw: ['仪表盘','大盘','dashboard','首页','主页','概览'], page: 'dashboard', label: '仪表盘' },
+      { kw: ['需求洞察','需求','洞察','demand','客户需求'], page: 'demand', label: '需求洞察' },
+      { kw: ['项目管理','项目列表','项目','projects','工程管理','工程列表'], page: 'projects', label: '项目管理' },
+      { kw: ['客户评价','评价','csi','满意度','评分'], page: 'evaluation', label: '客户评价' },
+      { kw: ['lp管理','lp','投资管理','投资人','合伙人'], page: 'lp', label: 'LP管理' },
+      { kw: ['协同办公','协同','办公','collab','协作','工作台'], page: 'collab', label: '协同办公' },
+      { kw: ['设计与工程','设计','工程','design','bim'], page: 'design', label: '设计与工程' },
+      { kw: ['ai引擎','ai','人工智能','智能','算法','引擎'], page: 'ai', label: 'AI引擎' },
+      { kw: ['会员','会员数据','用户数据','用户','members','用户分析','会员分析','用户画像'], page: 'members', label: '会员数据' },
+      { kw: ['设置','配置','settings','系统设置'], page: 'settings', label: '设置' },
+    ];
+    for (const n of navMap) {
+      for (const k of n.kw) {
+        if (c.includes(k)) {
+          document.querySelectorAll('.nav-item').forEach(ni => ni.classList.remove('active'));
+          const item = document.querySelector(`[data-page="${n.page}"]`);
+          if (item) { item.classList.add('active'); document.getElementById('pageTitle').textContent = pageTitles[n.page]; renderPage(n.page); this.speak('已切换到' + n.label); }
+          return;
+        }
+      }
+    }
+
+    // ===== 协同办公子Tab切换 =====
+    if (c.includes('招投标') || c.includes('招标') || c.includes('投标') || c.includes('bidding')) { this.switchCollabTab('bidding'); return; }
+    if (c.includes('规划') || c.includes('设计') && (c.includes('方案')||c.includes('图纸')||c.includes('变更'))) { this.switchCollabTab('planning'); return; }
+    if (c.includes('工程') && !c.includes('工程列表') && !c.includes('设计与工程')) { this.switchCollabTab('engineering'); return; }
+    if (c.includes('客诉') || c.includes('投诉') || c.includes('维修') || c.includes('complaint')) { this.switchCollabTab('complaint'); return; }
+
+    // ===== 招投标操作 =====
+    if (c.includes('新建招标') || c.includes('创建招标') || c.includes('发起招标')) { this.execInCollab('bidding-new'); return; }
+    if (c.includes('新建供应商') || c.includes('新增供应商') || c.includes('添加供应商')) { this.execInCollab('bidder-new'); return; }
+    // 查看具体招标详情
+    const bidMatch = cmd.match(/zb\d{4}[-]\d{3}/i);
+    if (bidMatch) { this.execInCollab('bidding-detail', bidMatch[0].toUpperCase()); return; }
+    if ((c.includes('招标详情') || c.includes('查看招标')) && c.includes('zb')) {
+      const m = cmd.match(/zb\d{4}[-]\d{3}/i);
+      if (m) { this.execInCollab('bidding-detail', m[0].toUpperCase()); return; }
+    }
+    // 供应商详情
+    const supNames = ['中建三局','浙江建工','上海建工','中天建设','绿城装饰'];
+    for (const sn of supNames) {
+      if (c.includes(sn)) { this.execInCollab('bidder-detail', sn); return; }
+    }
+
+    // ===== 规划设计操作 =====
+    if (c.includes('新建方案') || c.includes('创建设计方案') || c.includes('新建设计')) { this.execInCollab('design-new'); return; }
+    const dsMatch = cmd.match(/ds\d{3}/i);
+    if (dsMatch) { this.execInCollab('design-detail', dsMatch[0].toUpperCase()); return; }
+    if ((c.includes('方案详情') || c.includes('设计方案')) && c.includes('ds')) {
+      const m = cmd.match(/ds\d{3}/i);
+      if (m) { this.execInCollab('design-detail', m[0].toUpperCase()); return; }
+    }
+    // 审批变更
+    const chgMatch = cmd.match(/chg\d{3}/i);
+    if (chgMatch && (c.includes('通过')||c.includes('批准')||c.includes('同意'))) {
+      const btn = { dataset: { id: chgMatch[0].toUpperCase() } };
+      handleCollabAction('approve-change', btn); this.speak('已审批通过'); return;
+    }
+    if (chgMatch && (c.includes('驳回')||c.includes('拒绝'))) {
+      const btn = { dataset: { id: chgMatch[0].toUpperCase() } };
+      handleCollabAction('reject-change', btn); this.speak('已驳回'); return;
+    }
+
+    // ===== 工程管理操作 =====
+    if (c.includes('进入bim') || c.includes('打开bim') || c.includes('bim平台') || c.includes('启动bim')) { this.execInCollab('bim-enter'); return; }
+
+    // ===== 客诉与维修操作 =====
+    if (c.includes('新建投诉') || c.includes('创建投诉') || c.includes('发起投诉') || c.includes('提交投诉')) { this.execInCollab('complaint-new'); return; }
+    if (c.includes('新建工单') || c.includes('创建工单') || c.includes('新建维修') || c.includes('发起维修')) { this.execInCollab('repair-new'); return; }
+    const cpMatch = cmd.match(/cp\d{3}/i);
+    if (cpMatch) { this.execInCollab('complaint-detail', cpMatch[0].toUpperCase()); return; }
+    const rpMatch = cmd.match(/rp\d{3}/i);
+    if (rpMatch) { this.execInCollab('repair-detail', rpMatch[0].toUpperCase()); return; }
+    if ((c.includes('投诉详情') || c.includes('查看投诉')) && c.includes('cp')) {
+      const m = cmd.match(/cp\d{3}/i);
+      if (m) { this.execInCollab('complaint-detail', m[0].toUpperCase()); return; }
+    }
+    if ((c.includes('维修详情') || c.includes('查看工单') || c.includes('工单详情')) && c.includes('rp')) {
+      const m = cmd.match(/rp\d{3}/i);
+      if (m) { this.execInCollab('repair-detail', m[0].toUpperCase()); return; }
+    }
+
+    // ===== 项目管理：阶段筛选 =====
+    if (c.includes('全部阶段') || c.includes('所有阶段')) { this.findAndClick(['全部']); return; }
+    const stageKW = [
+      { kw: ['需求发现','阶段一'], el: '需求发现' },
+      { kw: ['精准获地','阶段二'], el: '精准获地' },
+      { kw: ['共创设计','阶段三'], el: '共创设计' },
+      { kw: ['透明建造','阶段四'], el: '透明建造' },
+      { kw: ['个性化交付','阶段五'], el: '个性化交付' },
+      { kw: ['评价验收','阶段六'], el: '评价验收' },
+      { kw: ['持续运营','阶段七'], el: '持续运营' },
+    ];
+    for (const sk of stageKW) {
+      for (const k of sk.kw) {
+        if (c.includes(k)) { this.findAndClick([sk.el]); return; }
+      }
+    }
+
+    // ===== 客户评价：子tab切换 =====
+    if (c.includes('触点评分') || c.includes('触点')) { this.findAndClick(['触点评分']); return; }
+    if (c.includes('工单跟踪') || c.includes('工单')) { this.findAndClick(['工单跟踪']); return; }
+
+    // ===== LP管理：分红计算 =====
+    if (c.includes('计算分红') || c.includes('分红计算') || c.includes('算分红')) { this.findAndClick(['计算']); return; }
+
+    // ===== 设计与工程 =====
+    if (c.includes('查看模块库') || c.includes('模块库')) { this.findAndClick(['模块库']); return; }
+    if (c.includes('查看工程进度') || c.includes('工程进度')) { this.findAndClick(['工程进度']); return; }
+
+    // ===== AI引擎 =====
+    if (c.includes('训练模型') || c.includes('模型训练')) { this.findAndClick(['训练']); return; }
+    if (c.includes('查看预测') || c.includes('预测结果')) { this.findAndClick(['预测']); return; }
+
+    // ===== 会员数据 =====
+    if (c.includes('导出报表') || c.includes('导出')) { this.findAndClick(['导出']); return; }
+    if (c.includes('查看详情') && (c.includes('会员')||c.includes('用户'))) { this.findAndClick(['详情']); return; }
+
+    // ===== 设置页 =====
+    if (c.includes('保存设置') || c.includes('确认设置')) { this.findAndClick(['保存']); return; }
+    if (c.includes('重置设置') || c.includes('恢复默认')) { this.findAndClick(['重置']); return; }
+
+    // ===== 全局弹窗操作 =====
+    if (c.includes('确认') || c.includes('确定') || c.includes('提交')) {
+      const modal = document.getElementById('globalModal');
+      if (modal && modal.style.display !== 'none') { this.findAndClick(['确认','确定','提交']); return; }
+    }
+    if (c.includes('取消') || c.includes('关闭弹窗')) {
+      const modal = document.getElementById('globalModal');
+      if (modal && modal.style.display !== 'none') { modal.style.display = 'none'; this.speak('已关闭'); return; }
+    }
+
+    // ===== 通用：在当前可见页面搜索匹配按钮并点击 =====
+    if (this.findAndClick(c)) return;
+
+    // ===== 通用操作 =====
+    if (c.includes('向上') || c.includes('顶部') || c.includes('回到顶部')) { window.scrollTo({top:0,behavior:'smooth'}); this.speak('已回到顶部'); return; }
+    if (c.includes('向下') || c.includes('底部') || c.includes('滚动到底')) { window.scrollTo({top:9999,behavior:'smooth'}); this.speak('已滚动到底部'); return; }
+    if (c.includes('刷新') || c.includes('重新加载')) { location.reload(); return; }
+    if (c.includes('关闭弹窗') || c.includes('关闭窗口') || c.includes('返回')) {
+      const modal = document.getElementById('globalModal');
+      if (modal && modal.style.display !== 'none') { modal.style.display = 'none'; this.speak('已关闭'); return; }
+      this.speak('没有打开的弹窗');
+      return;
+    }
+
+    // ===== 帮助 =====
+    if (c.includes('帮助') || c.includes('能做什么') || c.includes('功能') || c.includes('指令')) {
+      this.speak('你可以通过语音触发页面上任意按钮。试试说「打开仪表盘」「切换到协同办公」「切换到招投标」「新建招标」「查看ZB2026-001」「进入BIM平台」「计算分红」「触点评分」「全部阶段」「导出报表」「刷新页面」「回到顶部」「关闭弹窗」。');
+      return;
+    }
+
+    // 兜底
+    this.speak('没有听懂，请再说一次。试试说「帮助」了解语音指令。');
+  },
+
+  toggleListen() {
+    if (this.listening) { this.recognition.stop(); this.listening = false; }
+    else { this.recognition.start(); this.listening = true; this.speak('请说指令'); }
+    this.updateBtn();
+  },
+
+  toggleSpeak() { this.enabled = !this.enabled; this.updateBtn(); if(!this.enabled && this.synth) this.synth.cancel(); },
+
+  // 通用按钮匹配：在当前可见页面中搜索按钮文本并点击
+  findAndClick(keywords) {
+    const kwList = Array.isArray(keywords) ? keywords : [keywords];
+    // 搜索所有可点击元素
+    const clickables = document.querySelectorAll('button, [onclick], .btn, .nav-item, .collab-tab, .subtab, .stage-btn, .project-card, .stat-card, .setting-row, .card-header button');
+    for (const el of clickables) {
+      if (!el.offsetParent && el.tagName !== 'BUTTON') continue;
+      const text = (el.textContent || '').replace(/\s+/g, '');
+      for (const kw of kwList) {
+        const cleanKw = kw.replace(/\s+/g, '');
+        if (cleanKw.length < 2) continue;
+        if (text.includes(cleanKw)) {
+          el.click();
+          this.speak('已执行');
+          return true;
+        }
+      }
+    }
+    // 也搜索弹窗中的按钮
+    const modal = document.getElementById('globalModal');
+    if (modal && modal.style.display !== 'none') {
+      const modalBtns = modal.querySelectorAll('button, [onclick]');
+      for (const btn of modalBtns) {
+        const text = (btn.textContent || '').replace(/\s+/g, '');
+        for (const kw of kwList) {
+          const cleanKw = kw.replace(/\s+/g, '');
+          if (cleanKw.length < 2) continue;
+          if (text.includes(cleanKw)) {
+            btn.click();
+            this.speak('已执行');
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  },
+
+  updateBtn() {
+    const b = document.getElementById('voiceBtn');
+    const m = document.getElementById('voiceMute');
+    if (!b) return;
+    b.style.background = this.listening ? '#e53e3e' : '#1a365d';
+    b.innerHTML = this.listening ? '🎤⋯' : '🎤';
+    if (m) m.innerHTML = this.enabled ? '🔊' : '🔇';
+  },
+
+  createUI() {
+    const el = document.createElement('div');
+    el.id = 'voiceUI';
+    el.innerHTML = `
+      <style>
+        #voiceBtn { position:fixed; right:20px; bottom:40px; width:52px; height:52px; border-radius:50%; background:#1a365d; color:#fff; border:none; font-size:22px; cursor:pointer; z-index:9998; box-shadow:0 4px 20px rgba(0,0,0,0.25); display:flex; align-items:center; justify-content:center; transition:all 0.3s; }
+        #voiceBtn:hover { transform:scale(1.1); }
+        #voiceBtn.listening { animation: voicePulse 1s infinite; background:#e53e3e; }
+        #voiceMute { position:fixed; right:20px; bottom:100px; width:38px; height:38px; border-radius:50%; background:#fff; color:#718096; border:1px solid #e2e8f0; font-size:16px; cursor:pointer; z-index:9998; box-shadow:0 2px 8px rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; }
+        #voiceTip { position:fixed; right:78px; bottom:50px; background:#1a365d; color:#fff; padding:8px 14px; border-radius:20px; font-size:12px; z-index:9997; opacity:0; transition:opacity 0.3s; pointer-events:none; white-space:nowrap; }
+        @keyframes voicePulse { 0%,100%{box-shadow:0 0 0 0 rgba(229,62,62,0.4)} 50%{box-shadow:0 0 0 14px rgba(229,62,62,0)} }
+      </style>
+      <div id="voiceTip">点击麦克风，说出指令</div>
+      <button id="voiceMute" onclick="Voice.toggleSpeak()" title="语音反馈开关">🔊</button>
+      <button id="voiceBtn" onclick="Voice.toggleListen()" title="语音指令（点击说话）">🎤</button>
+    `;
+    document.body.appendChild(el);
+    // 提示浮层自动消失
+    setTimeout(() => { const t = document.getElementById('voiceTip'); if (t) { t.style.opacity = '1'; setTimeout(() => { t.style.opacity = '0'; }, 5000); } }, 1500);
+  }
+};
+
+// 注意：已移除 hover 朗读功能。语音系统现在根据语言指令执行具体任务。
+
+setTimeout(() => Voice.init(), 1000);
+</script>
+</body>
+</html>
