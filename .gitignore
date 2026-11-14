@@ -12,3 +12,7 @@ dist/netlify.toml.json
 dist/playwright-cli.json
 .public_url
 daemon.py
+.env
+.env.*
+*.pem
+*.key
